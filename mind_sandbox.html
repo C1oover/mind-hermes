@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mind Sandbox — canonical runner</title>
+<style>
+:root{color-scheme:dark;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#101318;color:#e3e8ef}*{box-sizing:border-box}body{margin:0;min-height:100vh}main{max-width:980px;margin:auto;padding:28px 20px 48px}h1{font:700 clamp(1.6rem,4vw,2.6rem)/1.1 system-ui;margin:0 0 12px}.lead{color:#aeb9c8;max-width:72ch}section{margin-top:24px;padding:18px;background:#171c25;border:1px solid #2b3442;border-radius:10px}h2{font:600 1rem/1.2 system-ui;margin:0 0 10px}code{background:#0f1319;border:1px solid #2b3442;border-radius:4px;padding:1px 5px}a{color:#8ec5ff}button{font:inherit;color:#fff;background:#2867b2;border:1px solid #4d8ed8;border-radius:6px;padding:9px 12px;cursor:pointer}button:hover{background:#3479c9}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.status{color:#aeb9c8}.ok{color:#8ee3a1}.bad{color:#ff9a9a}iframe{display:block;width:100%;height:70vh;min-height:580px;border:1px solid #2b3442;border-radius:8px;background:#11141b;margin-top:12px}
+</style>
+</head>
+<body>
+<main>
+<h1>Mind Sandbox</h1>
+<p class="lead">Canonical runner for the executable sandbox. The model implementation is kept in <a href="mind_sandbox_v5.html">mind_sandbox_v5.html</a>; this page is deliberately small so the canonical file remains the single simulation source of truth.</p>
+<section>
+<h2>Run the canonical sandbox</h2>
+<div class="row"><button id="open">Load sandbox</button><a href="mind_sandbox_v5.html">Open in a separate tab</a><span id="status" class="status">Not loaded.</span></div>
+<iframe id="sandbox" title="Mind ODE sandbox" hidden></iframe>
+</section>
+<section>
+<h2>Model reference</h2>
+<p>Current parameter defaults, traits, event codes and state topology are documented in <a href="docs/CURRENT_MODEL.md">docs/CURRENT_MODEL.md</a>. The reference describes implemented behaviour and separately lists approved-but-unimplemented changes.</p>
+</section>
+</main>
+<script>
+const frame=document.getElementById('sandbox');
+const status=document.getElementById('status');
+document.getElementById('open').addEventListener('click',()=>{status.textContent='Loading canonical sandbox…';status.className='status';frame.hidden=false;frame.src='mind_sandbox_v5.html';});
+frame.addEventListener('load',()=>{status.textContent='Loaded canonical mind_sandbox_v5.html.';status.className='status ok';});
+frame.addEventListener('error',()=>{status.textContent='Could not load the sandbox.';status.className='status bad';});
+</script>
+</body>
+</html>
