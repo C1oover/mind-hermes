@@ -1,0 +1,14 @@
+name: mind-hermes
+version: 0.1.0
+description: Persistent mind-state dynamics and expression-layer persona for Hermes Agent.
+kind: standalone
+requires_env: []
+provides_tools:
+  - mind_event
+  - mind_state
+  - mind_persona
+  - mind_reset
+provides_hooks:
+  - pre_llm_call
+  - on_session_start
+  - on_session_end
