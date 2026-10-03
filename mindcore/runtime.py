@@ -1,8 +1,8 @@
 """Hermes-independent runtime: wall-clock time, substepping, persistence, persona.
 
 Sim time t is in minutes since local midnight of the day the state was created,
-so Env.at(t) sees the real local hour of day. STATUS: written against mind.py and
-engine.py as read from the repository; unverified until CI passes.
+so Env.at(t) sees the real local hour of day. Substeps are 1 minute, the same dt
+used by the golden test against the JS model.
 """
 import datetime
 import json
@@ -16,7 +16,7 @@ from .tables import DEFAULTS
 
 SCHEMA = "mind-hermes-state-v1"
 MAX_GAP_MIN = 2880.0
-SUBSTEP_MIN = 5.0
+SUBSTEP_MIN = 1.0
 PRESENCE_GRACE_MIN = 5.0
 EVENT_DT_MIN = 0.05
 INPUT_KEYS = ("load", "commit_task", "commit_rel", "task_demand")
