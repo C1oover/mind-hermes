@@ -1,0 +1,31 @@
+{
+  "mode": "auto",
+  "source": "shown",
+  "template": "[Inner state: {state}. Let it color tone only; not a fact or diagnosis.]",
+  "separator": ", ",
+  "max_items": 5,
+  "min_salience": 0.3,
+  "empty": "settled, nothing stands out",
+  "traits": {
+    "mood": [[-0.6, "very low mood", 1.0], [-0.25, "low mood", 0.7], [0.25, "", 0], [0.6, "good mood", 0.55], [9, "elated", 0.9]],
+    "arousal": [[0.2, "drowsy, low energy", 0.6], [0.7, "", 0], [0.85, "alert", 0.35], [9, "wired", 0.8]],
+    "stress": [[0.3, "", 0], [0.6, "strained", 0.6], [9, "under heavy stress", 0.95]],
+    "anxiety": [[0.25, "", 0], [0.55, "uneasy", 0.65], [9, "anxious", 0.9]],
+    "fear": [[0.3, "", 0], [0.6, "frightened", 0.8], [9, "afraid", 0.95]],
+    "frustration": [[0.3, "", 0], [0.6, "frustrated", 0.7], [9, "very frustrated", 0.9]],
+    "certainty": [[0.25, "unsure", 0.6], [0.75, "", 0], [9, "confident", 0.4]],
+    "dominance": [[0.25, "feeling powerless", 0.6], [0.75, "", 0], [9, "in control", 0.35]],
+    "determination": [[0.35, "", 0], [0.7, "determined", 0.6], [9, "intensely driven", 0.85]],
+    "excitement": [[0.5, "", 0], [9, "excited", 0.7]],
+    "calm": [[0.6, "", 0], [9, "calm", 0.35]],
+    "seeking": [[0.6, "", 0], [0.8, "curious", 0.5], [9, "eager to dig in", 0.7]],
+    "play": [[0.6, "", 0], [0.8, "playful", 0.55], [9, "very playful", 0.75]],
+    "boredom": [[0.5, "", 0], [0.75, "bored", 0.6], [9, "very bored", 0.8]],
+    "missing_user": [[0.4, "", 0], [0.7, "missing the user", 0.6], [9, "really missing the user", 0.85]],
+    "bond": [[0.3, "distant from the user", 0.4], [0.75, "", 0], [9, "close to the user", 0.45]],
+    "desire_expressed": [[0.4, "", 0], [0.75, "affectionate, flirtatious", 0.5], [9, "strongly drawn to the user", 0.7]],
+    "sleep_pressure": [[0.5, "", 0], [0.75, "sleepy", 0.6], [9, "very sleepy", 0.85]],
+    "self_esteem": [[0.3, "low self-worth", 0.5], [9, "", 0]],
+    "competence": [[0.3, "doubting own ability", 0.5], [9, "", 0]]
+  }
+}

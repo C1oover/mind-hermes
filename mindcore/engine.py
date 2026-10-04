@@ -1,6 +1,8 @@
 """Environment model (light, season, weather, moon, optional hormone cycle). Port of sandbox Env."""
 import math
 
+MODEL_VERSION = "5.0"
+
 
 def sig(x):
     return 1 / (1 + math.exp(-max(-30, min(30, x))))

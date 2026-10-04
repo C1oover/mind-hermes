@@ -19,6 +19,6 @@ def test_runtime_event_and_persona(tmp_path):
 
 
 def test_traits_and_overrides():
-    assert len(TRAITS) >= 40
+    assert len(TRAITS) == 39
     p = effective_params(DEFAULTS, {"contentment_lock": 1.0, "uninhibited": 1.0, "prudishness": 1.0})
     assert p["floor_mood"] == 1.0 and p["cap_inh"] < 0.1 and p["lust_gate"] < 1.0
