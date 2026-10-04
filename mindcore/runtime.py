@@ -1,8 +1,7 @@
 """Hermes-independent runtime: wall-clock time, substepping, persistence, persona.
 
-Sim time t is in minutes since local midnight of the day the state was created,
-so Env.at(t) sees the real local hour of day. Substeps are 1 minute, the same dt
-used by the golden test against the JS model.
+Sim time t is in minutes since local midnight of the day the state was created.
+Persona traits (sandbox v5) change the model parameters via effective_params.
 """
 import datetime
 import json
@@ -11,10 +10,10 @@ from pathlib import Path
 
 from .engine import Env
 from .mind import Mind
-from .persona import apply_persona, default_persona, normalize_persona
+from .persona import apply_persona, default_persona, effective_params, normalize_persona
 from .tables import DEFAULTS
 
-SCHEMA = "mind-hermes-state-v1"
+SCHEMA = "mind-hermes-state-v2"
 MAX_GAP_MIN = 2880.0
 SUBSTEP_MIN = 1.0
 PRESENCE_GRACE_MIN = 5.0
@@ -44,13 +43,19 @@ class Runtime:
         if not self.load():
             self.reset()
 
+    def _apply_params(self):
+        self.params = effective_params(self.base, self.persona)
+        if getattr(self, "mind", None) is not None:
+            self.mind.P = self.params
+
     def reset(self):
         now = self.clock()
         self.t0, doy = local_midnight(now)
-        self.params = dict(DEFAULTS)
-        self.params["start_doy"] = doy
-        self.mind = Mind(self.params)
+        self.base = dict(DEFAULTS)
+        self.base["start_doy"] = doy
         self.persona = default_persona()
+        self.params = effective_params(self.base, self.persona)
+        self.mind = Mind(self.params)
         self.sim_t = (now - self.t0) / 60.0
         self.last_seen = self.sim_t
         self._ensure_out()
@@ -101,11 +106,12 @@ class Runtime:
         merged = dict(self.persona)
         merged.update(values or {})
         self.persona = normalize_persona(merged)
+        self._apply_params()
         return dict(self.persona)
 
     def snapshot(self):
         return {"schema": SCHEMA, "saved_at": self.clock(), "t0": self.t0, "sim_t": self.sim_t, "last_seen": self.last_seen,
-                "params": self.params, "persona": self.persona, "mind": {k: getattr(self.mind, k) for k in MIND_FIELDS}}
+                "params": self.base, "persona": self.persona, "mind": {k: getattr(self.mind, k) for k in MIND_FIELDS}}
 
     def save(self):
         self.root.mkdir(parents=True, exist_ok=True)
@@ -120,15 +126,16 @@ class Runtime:
             data = json.loads(self.path.read_text(encoding="utf-8"))
             if data.get("schema") != SCHEMA:
                 return False
-            params = dict(DEFAULTS)
-            params.update(data.get("params", {}))
+            base = dict(DEFAULTS)
+            base.update(data.get("params", {}))
+            persona = normalize_persona(data.get("persona"))
+            params = effective_params(base, persona)
             mind = Mind(params)
             for key in MIND_FIELDS:
                 if key in data["mind"]:
                     setattr(mind, key, data["mind"][key])
-            self.params, self.mind = params, mind
+            self.base, self.persona, self.params, self.mind = base, persona, params, mind
             self.t0 = float(data["t0"]); self.sim_t = float(data["sim_t"]); self.last_seen = float(data["last_seen"])
-            self.persona = normalize_persona(data.get("persona"))
         except (OSError, ValueError, KeyError, TypeError):
             return False
         self._ensure_out()
