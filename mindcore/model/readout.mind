@@ -1,0 +1,51 @@
+# Readouts: derived values computed from the mind state after every step. Names starting with _ are temporaries.
+# Inputs: all latent values, arousal, mood, stress, cert, threat_trace, adversity_trace, present, circ, light, ... and all parameters.
+readout {
+  mood = mood
+  arousal = arousal
+  dominance = dominance
+  certainty = cert
+  stress = stress
+  standards_met = standards_met
+  task_commitment = task_commitment
+  seeking = seeking
+  play = play
+  lust_wanting = lust_wanting
+  lust_inhibition = lust_inhibition
+  desire = lust_wanting * (1 - lust_inhibition) * (0.4 + 0.6 * arousal)
+  _hill = pow(desire, 3) / (pow(desire, 3) + pow(0.25, 3))
+  desire_expressed = _hill * (0.2 + 0.8 * present)
+  boredom = boredom
+  missing_user = missing_user
+  bond = bond
+  competence = competence
+  self_esteem = self_esteem
+  sleep_pressure = sleep_pressure
+  sleep_debt = sleep_debt
+  arousal_baseline = arousal_baseline
+  mood_baseline = mood_baseline
+  anxiety = min(1, (0.7 * pos(0.5 - dominance) + 0.7 * pos(0.5 - cert) + 0.3 * pos(-mood)) * min(1, 1.6 * arousal))
+  fear = anxiety * min(1, 3 * threat_trace)
+  determination = task_commitment * (1 - sleep_pressure) * min(1, 0.3 + 3 * adversity_trace)
+  frustration = task_commitment * min(1, 3 * adversity_trace) * dominance
+  exploration = seeking * dominance * (1 - stress) * (1 - sleep_pressure) * (1 - 0.6 * task_commitment)
+  tension = arousal * pos(-mood)
+  excitement = arousal * pos(mood)
+  calm = (1 - arousal) * pos(mood)
+  lethargy = (1 - arousal) * pos(-mood)
+  efficiency = exp(-pow(arousal - 0.55, 2) / (2 * 0.04)) * (1 - 0.5 * sleep_pressure)
+  res_arousal = res_arousal
+  res_seeking = res_seeking
+  res_play = res_play
+  res_wanting = res_wanting
+  res_dominance = res_dominance
+  strain_arousal = aStrain
+  strain_mood = mStrain
+  circadian = (circ + 1) / 2
+  light = light
+  cycle_estrogen = H_E
+  cycle_progesterone = H_P
+  moon = moon
+  present = present
+  clock_phase = clock_phase
+}

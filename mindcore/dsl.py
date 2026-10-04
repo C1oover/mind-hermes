@@ -152,13 +152,13 @@ class _Parser:
 
 def parse(text, origin="<model>"):
     p = _Parser(tokenize(text, origin), origin)
-    out = {"params": [], "defs": [], "traits": [], "resolve": []}
+    out = {"params": [], "defs": [], "traits": [], "resolve": [], "readout": []}
     p.skip_nl()
     while p.peek()[0] != "eof":
         tok = p.next()
         word, ln = tok[1], tok[2]
-        if tok[0] != "name" or word not in ("param", "def", "trait", "resolve"):
-            p.err("expected param, def, trait or resolve, got %r" % word, tok)
+        if tok[0] != "name" or word not in ("param", "def", "trait", "resolve", "readout"):
+            p.err("expected param, def, trait, resolve or readout, got %r" % word, tok)
         if word == "param":
             name = p.expect("name")[1]
             p.expect("op", "=")
@@ -186,7 +186,7 @@ def parse(text, origin="<model>"):
             out["traits"].append({"name": name, "meta": meta, "stmts": p.block(), "line": ln, "origin": origin})
             p.end_stmt()
         else:
-            out["resolve"].extend(p.block())
+            out["resolve" if word == "resolve" else "readout"].extend(p.block())
             p.end_stmt()
     return out
 

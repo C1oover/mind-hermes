@@ -6,12 +6,12 @@ from pathlib import Path
 from .dsl import Evaluator, ModelError, parse
 
 BUNDLED = Path(__file__).parent / "model"
-FILES = ("params.mind", "traits.mind", "resolve.mind")
+FILES = ("params.mind", "traits.mind", "resolve.mind", "readout.mind")
 
 
 class Model:
     def __init__(self):
-        self.params, self.meta, self.funcs, self.traits, self.resolve = {}, {}, {}, {}, []
+        self.params, self.meta, self.funcs, self.traits, self.resolve, self.readout = {}, {}, {}, {}, [], {}
         self.ev = Evaluator(self.funcs)
 
     def add(self, text, origin="<model>"):
@@ -24,6 +24,10 @@ class Model:
         for t in prog["traits"]:
             self.traits[t["name"]] = t
         self.resolve.extend(prog["resolve"])
+        for st in prog["readout"]:
+            if st[1] != "=":
+                raise ModelError("readout statements must use =", st[3], st[4])
+            self.readout[st[0]] = st
         return self
 
     def validate(self):
@@ -69,6 +73,18 @@ class Model:
         for nm, op, expr, line, origin in self.resolve:
             E[nm] = self.ev.apply(op, E[nm], self.ev.eval(expr, E, origin), line, origin)
         return E
+
+
+def _evaluate_readout(self, inputs, params):
+    """Run the readout block: names starting with _ are temporaries, everything else is returned."""
+    out = {}
+    scope = ChainMap(out, inputs, params)
+    for name, _op, expr, _line, origin in self.readout.values():
+        out[name] = self.ev.eval(expr, scope, origin)
+    return {k: v for k, v in out.items() if not k.startswith("_")}
+
+
+Model.evaluate_readout = _evaluate_readout
 
 
 def load_model(user_path=None):

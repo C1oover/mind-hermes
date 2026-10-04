@@ -28,4 +28,20 @@ resolve {
 `mindcore/persona_legacy.py` is the previous hard-coded implementation; `tests/test_model_equivalence.py` checks that the
 model files give identical effective parameters for every trait and 300 random personas.
 
-Not yet implemented: conditionals, user-defined state variables and readouts, and a JavaScript parser for the web UI.
+## Readouts
+
+`mindcore/model/readout.mind` defines the values returned after every step (desire, anxiety, efficiency, ...):
+
+```
+readout {
+  _hill = pow(desire, 3) / (pow(desire, 3) + pow(0.25, 3))
+  desire_expressed = _hill * (0.2 + 0.8 * present)
+}
+```
+
+Only `=` is allowed. Names starting with `_` are temporaries and are not returned. Inputs are the latent values, `arousal`, `mood`, `stress`,
+`cert`, `threat_trace`, `adversity_trace`, `present`, `circ`, `light`, `H_E`, `H_P`, `moon`, and all effective parameters.
+A user `model.mind` can redefine a readout or add new ones; they appear in `Mind.out`. `Mind.readout_legacy` keeps the old Python
+version for `tests/test_readout_model.py`, which checks both agree over 30 simulated interactions across several days.
+
+Not yet implemented: conditionals, user-defined state variables and dynamics (the ODE step is still Python), and a JavaScript parser for the web UI.
