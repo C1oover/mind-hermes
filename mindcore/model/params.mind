@@ -1,0 +1,160 @@
+# Parameters: `param name = value | key=value ...`. min/max clamp the effective value after traits ran.
+
+param speed_fast = 1
+param speed_mid = 1
+param speed_slow = 1
+param carry_valence_to_mood = 0.4 | min=0
+param carry_phasic_to_arousal = 0.08 | min=0
+param carry_standards_to_selfesteem = 0.15 | min=0
+param slow_follow_mood = 0.35 | min=0
+param slow_follow_arousal = 0.25 | min=0
+param mood_avg_hl = 1440
+param hl_phasic = 4
+param hl_valence_reaction = 8
+param hl_threat = 10
+param hl_surprise = 20
+param hl_adversity = 20
+param hl_recent_success = 30
+param hl_arousal_tonic = 60
+param hl_mood = 360
+param hl_dominance = 180
+param hl_standards = 720
+param hl_seeking = 90
+param hl_play = 120
+param hl_wanting = 45
+param hl_inhibition = 120
+param hl_missing = 180
+param hl_commit = 15
+param tau_boredom = 130
+param hl_bond = 14400
+param hl_competence = 2880
+param hl_self_esteem = 20160
+param hl_arousal_baseline = 2160
+param hl_mood_baseline = 4320
+param imp_phasic_novelty = 0.5 | min=0
+param imp_phasic_threat = 0.9
+param imp_phasic_erotic = 0.4 | min=0
+param imp_phasic_goal = 0.2
+param imp_phasic_anticipation = 0.3
+param imp_val_goal = 0.15
+param imp_val_warm = 0.1 | min=0
+param imp_val_standards = 0.1 | min=0
+param reunion_relief = 0.6
+param impulse_cap = 0.8
+param impulse_budget = 1.5
+param appraisal_saturation = 3
+param surprise_gain = 0.3
+param habituation_strength = 0.15
+param habituation_half_life = 30
+param mood_congruence = 0.3
+param hormone_congruence = 0.2
+param missing_warmth_boost = 0.5 | min=0
+param intensity_bond = 1 | min=0
+param freeform_reference = 5
+param hammer_scale = 1
+param hammer_half_life = 30
+param gate_floor_phasic = 0.1
+param phasic_scale = 3
+param blunting = 1.2
+param rumination = 0.5
+param giveup = 0.5
+param ctl_on = 1
+param demand_gain = 1.6
+param strain_threshold = 0.75
+param strain_gain = 1.5
+param strain_hl = 720
+param strain_to_baseline = 0.35
+param mood_strain_threshold = 0.4
+param mood_strain_gain = 1
+param mood_strain_to_baseline = 0.6
+param spill_arousal = 0.15
+param spill_mood = 0.1
+param spill_debt = 0.002
+param spill_daily_cap = 0.6
+param boredom_rate = 0.8 | min=0
+param reunion_keep = 0.4
+param missing_ramp = 2 | min=0
+param detach_start = 4320
+param detach_tau = 2880
+param bond_baseline = 0.45
+param circ_arousal = 0.7
+param sleep_pressure_arousal = 1.4
+param ultradian_amp = 0.08
+param weather_mood = 0.15
+param mood_baseline_offset = 0.25
+param bistable = 0 | min=0
+param wanting_deprivation = 0.3
+param deprivation_scale = 2880
+param tau_wake = 1092
+param tau_sleep = 252
+param load_fatigue = 0.0015
+param stress_fatigue = 0.0008
+param light_fatigue = 0.3
+param moon_sleep = 0.3
+param clock_anchor = 15
+param clock_period = 24
+param phase_gain = 0.0015
+param anchor_pull = 0.01
+param sleep_threshold = -0.3
+param sleep_standards_boost = 1
+param lat = 48.2
+param start_doy = 278
+param cloud = 0.4
+param pressure = 1013
+param weather_swing = 0
+param moon_on = 1
+param moon_phase0 = 5
+param cycle_alpha = 0 | min=0
+param cycle_length = 28
+param cycle_start_day = 3
+param tb_arousal = 0
+param tb_mood = 0
+param tb_dom = 0
+param tb_seek = 0
+param tb_play = 0
+param tb_want = 0
+param tb_inh = 0
+param tb_bond = 0
+param tb_comp = 0
+param tb_self = 0
+param imp_gain = 1
+param lust_mul = 1
+param cyc_amp = 0 | min=0
+param cyc_days = 6
+param floor_bond = 0
+param floor_comp = 0
+param floor_self = 0
+param floor_dom = 0
+param floor_mood = 0
+param cap_inh = 1 | min=0.03
+param lust_gate = 1
+param ctl_arousal_comfort = 0.6
+param ctl_arousal_drain = 0.4
+param ctl_arousal_rec = 300
+param ctl_arousal_rebound = 2.5
+param ctl_arousal_shield = 0.8
+param ctl_arousal_deriv = 6
+param ctl_seeking_comfort = 0.4
+param ctl_seeking_drain = 0.5
+param ctl_seeking_rec = 240
+param ctl_seeking_rebound = 1.2
+param ctl_seeking_shield = 0.4
+param ctl_seeking_deriv = 3
+param ctl_play_comfort = 0.3
+param ctl_play_drain = 0.5
+param ctl_play_rec = 240
+param ctl_play_rebound = 1
+param ctl_play_shield = 0
+param ctl_play_deriv = 2
+param ctl_lust_wanting_comfort = 0.3
+param ctl_lust_wanting_drain = 0.8
+param ctl_lust_wanting_rec = 180
+param ctl_lust_wanting_rebound = 1.2
+param ctl_lust_wanting_shield = 0
+param ctl_lust_wanting_deriv = 2
+param ctl_dominance_comfort = 0.55
+param ctl_dominance_drain = 0.3
+param ctl_dominance_rec = 360
+param ctl_dominance_rebound = 1
+param ctl_dominance_shield = 0.6
+param ctl_dominance_deriv = 2
