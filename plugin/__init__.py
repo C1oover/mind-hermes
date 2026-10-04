@@ -1,11 +1,11 @@
 """Hermes Agent plugin: thin wrapper over mindcore.runtime.Runtime."""
 import os
 
+from mindcore.render import load_config, render
 from mindcore.runtime import Runtime, safe_id
 
 STATE_DIR = os.environ.get("MIND_HERMES_STATE_DIR", "~/.hermes/mind-hermes")
 RUNTIMES = {}
-COMPACT = ("mood", "arousal", "stress", "certainty", "seeking", "play", "bond", "missing_user", "sleep_pressure", "anxiety", "determination")
 EVENT_SCHEMA = {
     "type": "object",
     "properties": {
@@ -59,10 +59,9 @@ def mind_reset(session_id="default", **kw):
 
 def pre_llm_call(session_id="default", **kw):
     r = runtime(session_id)
-    shown = r.interact()["shown"]
+    state = r.interact()
     r.save()
-    text = ", ".join("%s=%.2f" % (k, shown.get(k, 0.0)) for k in COMPACT)
-    return {"context": "[Mind state: %s. Optional tone context only; not a diagnosis or an external fact.]" % text}
+    return {"context": render(state, load_config(STATE_DIR))}
 
 
 def on_session_start(session_id="default", **kw):
