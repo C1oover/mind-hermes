@@ -1,9 +1,15 @@
-"""Mind class: line-by-line port of the v4 JS model. Time in minutes."""
+"""Mind class: line-by-line port of the mind_sandbox.html model. Time in minutes.
+Trait hooks (tb_*, imp_gain, cyc_amp, floor_*, cap_inh) are neutral at their defaults."""
 import math
 from .tables import CODES, ALIAS, CTRLV, LATENT, VALUE, SIGNED
 from .engine import (VALUESET, sig, clip, pos, sgn, lu, ls, soft_or, relax, ctl_p)
 
 _TRACE_KEYS = ("eg", "n", "ew", "es", "ep", "el", "th", "succ", "fail")
+
+
+def _lu2(v):
+    v = min(.995, max(.005, v))
+    return math.log(v / (1 - v))
 
 
 class Mind:
@@ -128,9 +134,9 @@ class Mind:
             a[k] *= gpos if a[k] > 0 else gneg
         a["ew"] = a["ew"] * gpos * (1 + x["missing_user"] * P["missing_warmth_boost"]) if a["ew"] > 0 else a["ew"] * gneg
         # fast layer
-        dph = P["imp_phasic_novelty"] * a["n"] + P["imp_phasic_threat"] * a["th"] + P["imp_phasic_erotic"] * a["el"] + P["imp_phasic_goal"] * abs(a["eg"])
+        dph = P["imp_gain"] * (P["imp_phasic_novelty"] * a["n"] + P["imp_phasic_threat"] * a["th"] + P["imp_phasic_erotic"] * a["el"] + P["imp_phasic_goal"] * abs(a["eg"]))
         self.arousal_phasic = self.arousal_phasic * dec(hF("hl_phasic")) + dph + dt * P["imp_phasic_anticipation"] * anticipation
-        dvr = P["imp_val_goal"] * a["eg"] + P["imp_val_warm"] * a["ew"] + P["imp_val_standards"] * a["es"] + P["reunion_relief"] * reunion
+        dvr = P["imp_gain"] * (P["imp_val_goal"] * a["eg"] + P["imp_val_warm"] * a["ew"] + P["imp_val_standards"] * a["es"] + P["reunion_relief"] * reunion)
         self.valence_reaction = self.valence_reaction * dec(hF("hl_valence_reaction")) + dvr + dt * (.15 * anticipation - .1 * overdue)
         self.threat_trace = self.threat_trace * dec(hF("hl_threat")) + a["th"]
         self.adversity_trace = self.adversity_trace * dec(hF("hl_adversity")) + pos(-a["eg"])
@@ -156,17 +162,20 @@ class Mind:
         # mid layer
         sl = env["seasonal_light"]; light = env["light"]; W_L = env["pressure_low"]; W_d = env["pressure_drop"]
         H_E = env["H_E"]; H_P = env["H_P"]; H_T = env["H_T"]; H_W = env["H_W"]
+        cy = math.sin(2 * math.pi * t / (1440 * P["cyc_days"]))
         ultra = P["ultradian_amp"] * math.cos(2 * math.pi * t / 90)
         za = (z["arousal_baseline"] + P["circ_arousal"] * C - P["sleep_pressure_arousal"] * (S - .3) + .4 * (x["seeking"] - .3)
               + .4 * x["missing_user"] + .5 * stress + .3 * W_d - .5 * H_P + .3 * H_W + .5 * present * (.5 + load)
-              + .3 * anticipation + ultra + P["ctl_on"] * P["demand_gain"] * demand * self.task_commitment + ctl["arousal"])
+              + .3 * anticipation + ultra + P["ctl_on"] * P["demand_gain"] * demand * self.task_commitment + ctl["arousal"]
+              + P["tb_arousal"] + .5 * P["cyc_amp"] * cy)
         z["arousal_tonic"] = relax(z["arousal_tonic"], za, hM("hl_arousal_tonic") * (1 + P["rumination"] * pos(-mood)), dt) + P["carry_phasic_to_arousal"] * dph
         zm = (.7 * z["mood_baseline"] - .5 * x["boredom"] - .6 * pos(S - .6) + .3 * x["standards_met"] + .4 * (rs - .5)
-              - .5 * x["missing_user"] - P["weather_mood"] * (.5 * (1 - light) + .3 * W_L + .2 * W_d))
+              - .5 * x["missing_user"] - P["weather_mood"] * (.5 * (1 - light) + .3 * W_L + .2 * W_d)
+              + P["tb_mood"] + P["cyc_amp"] * cy)
         z["mood"] = relax(z["mood"], zm, hM("hl_mood"), dt) + P["carry_valence_to_mood"] * dvr
         domT = clip(.5 + .5 * (x["competence"] - .5) + .35 * (rs - .5) + .2 * x["standards_met"] - .3 * (S - .3)
                     - .25 * math.tanh(self.surprise_trace) + .15 * H_T, .03, .97)
-        z["dominance"] = relax(z["dominance"], lu(domT) + ctl["dominance"], hM("hl_dominance"), dt)
+        z["dominance"] = relax(z["dominance"], lu(domT) + ctl["dominance"] + P["tb_dom"], hM("hl_dominance"), dt)
         hls = hM("hl_standards") * (1 + .5 * pos(-mood) * (1 - present)) / (1 + P["sleep_standards_boost"] * (1 if self.asleep else 0))
         z["standards_met"] = relax(z["standards_met"], ls(.8 * (x["self_esteem"] - .5)), hls, dt)
         g = self.task_commitment
@@ -178,10 +187,10 @@ class Mind:
         wantT = clip(.2 + .5 * x["bond"] * pos(mood) + .7 * gR + P["wanting_deprivation"] * (1 - math.exp(-self.since_warm / P["deprivation_scale"]))
                      + .25 * H_E + .15 * H_T - .3 * H_P - .3 * S, .03, .97)
         inhT = clip(.05 + .3 * g + .5 * stress + .25 * S + .5 * gR * (1 - x["dominance"]) * (1 - x["competence"]) + .2 * H_W + .2 * math.tanh(self.threat_trace), .03, .97)
-        z["seeking"] = relax(z["seeking"], lu(seekT) + ctl["seeking"], hM("hl_seeking"), dt)
-        z["play"] = relax(z["play"], lu(playT) + ctl["play"], hM("hl_play"), dt)
-        z["lust_wanting"] = relax(z["lust_wanting"], lu(wantT) + ctl["lust_wanting"], hM("hl_wanting"), dt)
-        z["lust_inhibition"] = relax(z["lust_inhibition"], lu(inhT), hM("hl_inhibition"), dt)
+        z["seeking"] = relax(z["seeking"], lu(seekT) + ctl["seeking"] + P["tb_seek"], hM("hl_seeking"), dt)
+        z["play"] = relax(z["play"], lu(playT) + ctl["play"] + P["tb_play"], hM("hl_play"), dt)
+        z["lust_wanting"] = relax(z["lust_wanting"], lu(wantT) + ctl["lust_wanting"] + P["tb_want"], hM("hl_wanting"), dt)
+        z["lust_inhibition"] = relax(z["lust_inhibition"], lu(inhT) + P["tb_inh"], hM("hl_inhibition"), dt)
         w = .2 if self.asleep else 1
         o = self.boredom
         u = P["boredom_rate"] * (1 - self.novelty_avg) * (1 - g) * (1 - S) * w
@@ -213,9 +222,9 @@ class Mind:
                         - .6 * pos(D - .5) + .35 * sl + .25 * H_E - .3 * H_W - P["mood_strain_to_baseline"] * self.mStrain + P["slow_follow_mood"] * self.mood_avg)
         z["mood_baseline"] = relax(z["mood_baseline"], ls(mbT), hS("hl_mood_baseline"), dt) + dt * P["bistable"] * x["mood_baseline"] * (1 - x["mood_baseline"] ** 2) / 1440
         inten = math.tanh(pos(self.arousal_phasic) / P["phasic_scale"])
-        z["bond"] = relax(z["bond"], lu(P["bond_baseline"]), hS("hl_bond"), dt) + hr("bond", x["bond"]) * (.05 * pos(a["ew"]) - .06 * pos(-a["ew"])) * (1 + P["intensity_bond"] * inten)
-        z["competence"] = relax(z["competence"], 0, hS("hl_competence"), dt) + hr("competence", x["competence"]) * (.6 + .8 * math.tanh(self.surprise_trace)) * (.03 * a["succ"] - .1 * a["fail"])
-        z["self_esteem"] = relax(z["self_esteem"], lu(.5 + .25 * x["standards_met"] + .2 * (x["competence"] - .5) + .2 * (x["bond"] - P["bond_baseline"])), hS("hl_self_esteem"), dt)
+        z["bond"] = relax(z["bond"], lu(P["bond_baseline"]) + P["tb_bond"], hS("hl_bond"), dt) + hr("bond", x["bond"]) * (.05 * pos(a["ew"]) - .06 * pos(-a["ew"])) * (1 + P["intensity_bond"] * inten)
+        z["competence"] = relax(z["competence"], P["tb_comp"], hS("hl_competence"), dt) + hr("competence", x["competence"]) * (.6 + .8 * math.tanh(self.surprise_trace)) * (.03 * a["succ"] - .1 * a["fail"])
+        z["self_esteem"] = relax(z["self_esteem"], lu(.5 + .25 * x["standards_met"] + .2 * (x["competence"] - .5) + .2 * (x["bond"] - P["bond_baseline"])) + P["tb_self"], hS("hl_self_esteem"), dt)
         # spillover with daily cap
         excA = arousal - x["arousal_tonic"]
         excM = mood - math.tanh(z["mood"] / (1 + P["blunting"] * pos(D - .4)))
@@ -237,6 +246,20 @@ class Mind:
         self.clock_phase = ph
         for n, d in (inp.get("freeform") or []):
             self.apply_freeform(n, d)
+        # override floors / caps (trait-driven; 0 / 1 = off)
+        if P["floor_bond"] > .001:
+            z["bond"] = max(z["bond"], _lu2(P["floor_bond"]))
+        if P["floor_comp"] > .001:
+            z["competence"] = max(z["competence"], _lu2(P["floor_comp"]))
+        if P["floor_self"] > .001:
+            z["self_esteem"] = max(z["self_esteem"], _lu2(P["floor_self"]))
+        if P["floor_dom"] > .001:
+            z["dominance"] = max(z["dominance"], _lu2(P["floor_dom"]))
+        if P["floor_mood"] > .001:
+            f = ls(clip(P["floor_mood"], 0, .97))
+            z["mood"] = max(z["mood"], f); z["mood_baseline"] = max(z["mood_baseline"], f)
+        if P["cap_inh"] < .999:
+            z["lust_inhibition"] = min(z["lust_inhibition"], _lu2(max(.01, P["cap_inh"])))
         self.readout(present, env, C)
 
     def readout(self, present, env, C):
