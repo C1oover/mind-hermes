@@ -87,6 +87,16 @@ def _evaluate_readout(self, inputs, params):
 Model.evaluate_readout = _evaluate_readout
 
 
+def _param_table(self):
+    """Rows for the UI: key, label, group, default, step, min, max, visible (file order)."""
+    return [{"key": k, "label": self.meta[k].get("label", k.replace("_", " ")), "group": self.meta[k].get("group", "Other"),
+             "default": v, "step": self.meta[k].get("step"), "min": self.meta[k].get("min"), "max": self.meta[k].get("max"),
+             "visible": self.meta[k].get("visible", True)} for k, v in self.params.items()]
+
+
+Model.param_table = _param_table
+
+
 def load_model(user_path=None):
     m = Model()
     for f in FILES:

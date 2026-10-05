@@ -44,4 +44,14 @@ Only `=` is allowed. Names starting with `_` are temporaries and are not returne
 A user `model.mind` can redefine a readout or add new ones; they appear in `Mind.out`. `Mind.readout_legacy` keeps the old Python
 version for `tests/test_readout_model.py`, which checks both agree over 30 simulated interactions across several days.
 
-Not yet implemented: conditionals, user-defined state variables and dynamics (the ODE step is still Python), and a JavaScript parser for the web UI.
+## Conditions and UI metadata
+
+```
+a += if value > 0 then 2 * value else 0.5 * value
+```
+
+- `if c then a else b` is lazy, so the unused branch is never evaluated. Comparisons are `< > <= >= == !=`, logic is `and or not`, and true/false are 1/0. Use parentheses to put an `if` inside arithmetic.
+- `group "Name"` sets the UI group of the params below it; `param` metadata accepts `label`, `step`, `min`, `max`, `visible`.
+- `Model.param_table()` returns the rows the UI needs. `tests/test_params_meta.py` checks them against the definitions still in `mind_sandbox.html`.
+
+Not yet implemented: user-defined state variables and dynamics (the ODE step is still Python), and a JavaScript parser for the web UI.

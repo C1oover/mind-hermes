@@ -11,7 +11,7 @@ class ModelError(ValueError):
 
 TOKEN = re.compile(
     r'(?P<ws>[ \t\r]+|\#[^\n]*)|(?P<nl>\n|;)|(?P<num>(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)'
-    r'|(?P<str>"[^"\n]*")|(?P<name>[A-Za-z_][A-Za-z_0-9]*)|(?P<op>\+=|-=|\*=|/=|[-+*/=(){},|])')
+    r'|(?P<str>"[^"\n]*")|(?P<name>[A-Za-z_][A-Za-z_0-9]*)|(?P<op>\+=|-=|\*=|/=|==|!=|<=|>=|[-+*/=<>(){},|])')
 ASSIGN = ("=", "+=", "-=", "*=", "/=")
 
 
@@ -91,6 +91,34 @@ class _Parser:
         return out
 
     def expr(self):
+        if self.peek()[:2] == ("name", "if"):
+            self.next()
+            c = self.expr()
+            self.expect("name", "then")
+            a = self.expr()
+            self.expect("name", "else")
+            return ("if", c, a, self.expr())
+        a = self.andexpr()
+        while self.accept("name", "or"):
+            a = ("or", a, self.andexpr())
+        return a
+
+    def andexpr(self):
+        a = self.notexpr()
+        while self.accept("name", "and"):
+            a = ("and", a, self.notexpr())
+        return a
+
+    def notexpr(self):
+        if self.accept("name", "not"):
+            return ("not", self.notexpr())
+        a = self.arith()
+        if self.peek()[0] == "op" and self.peek()[1] in ("<", ">", "<=", ">=", "==", "!="):
+            op = self.next()[1]
+            return ("cmp", op, a, self.arith())
+        return a
+
+    def arith(self):
         a = self.term()
         while self.peek()[:2] in (("op", "+"), ("op", "-")):
             _, op, ln = self.next()
@@ -153,17 +181,23 @@ class _Parser:
 def parse(text, origin="<model>"):
     p = _Parser(tokenize(text, origin), origin)
     out = {"params": [], "defs": [], "traits": [], "resolve": [], "readout": []}
+    group = None
     p.skip_nl()
     while p.peek()[0] != "eof":
         tok = p.next()
         word, ln = tok[1], tok[2]
-        if tok[0] != "name" or word not in ("param", "def", "trait", "resolve", "readout"):
-            p.err("expected param, def, trait, resolve or readout, got %r" % word, tok)
-        if word == "param":
+        if tok[0] != "name" or word not in ("param", "def", "trait", "resolve", "readout", "group"):
+            p.err("expected param, def, trait, resolve, readout or group, got %r" % word, tok)
+        if word == "group":
+            group = p.expect("str")[1][1:-1]
+            p.end_stmt()
+        elif word == "param":
             name = p.expect("name")[1]
             p.expect("op", "=")
             e = p.expr()
             meta = p.meta() if p.accept("op", "|") else {}
+            if group and "group" not in meta:
+                meta["group"] = group
             out["params"].append((name, e, meta, ln, origin))
             p.end_stmt()
         elif word == "def":
@@ -219,6 +253,17 @@ class Evaluator:
             return scope[e[1]]
         if k == "neg":
             return -self.eval(e[1], scope, origin, depth)
+        if k == "if":
+            return self.eval(e[2] if self.eval(e[1], scope, origin, depth) else e[3], scope, origin, depth)
+        if k == "or":
+            return 1.0 if (self.eval(e[1], scope, origin, depth) or self.eval(e[2], scope, origin, depth)) else 0.0
+        if k == "and":
+            return 1.0 if (self.eval(e[1], scope, origin, depth) and self.eval(e[2], scope, origin, depth)) else 0.0
+        if k == "not":
+            return 0.0 if self.eval(e[1], scope, origin, depth) else 1.0
+        if k == "cmp":
+            a, b = self.eval(e[2], scope, origin, depth), self.eval(e[3], scope, origin, depth)
+            return 1.0 if {"<": a < b, ">": a > b, "<=": a <= b, ">=": a >= b, "==": a == b, "!=": a != b}[e[1]] else 0.0
         if k == "bin":
             a, b = self.eval(e[2], scope, origin, depth), self.eval(e[3], scope, origin, depth)
             if e[1] == "+":
