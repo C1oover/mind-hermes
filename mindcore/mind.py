@@ -310,9 +310,7 @@ class Mind:
             "moon": env["moon"], "present": present, "clock_phase": self.clock_phase,
         }
 
-    def readout(self, present, env, C):
-        """Readouts are defined in mindcore/model/readout.mind (see docs/MODEL_LANGUAGE.md)."""
-        from .model import get_model
+    def readout_inputs(self, present, env, C):
         x = {k: self.value(k) for k in LATENT}
         for k in VALUE:
             x[k] = getattr(self, k)
@@ -322,4 +320,9 @@ class Mind:
                  clock_phase=self.clock_phase, circ=C, light=env["light"], H_E=env["H_E"], H_P=env["H_P"], moon=env["moon"],
                  res_arousal=self.res["arousal"], res_seeking=self.res["seeking"], res_play=self.res["play"],
                  res_wanting=self.res["lust_wanting"], res_dominance=self.res["dominance"])
-        self.out = get_model().evaluate_readout(x, self.P)
+        return x
+
+    def readout(self, present, env, C):
+        """Readouts are defined in mindcore/model/readout.mind (see docs/MODEL_LANGUAGE.md)."""
+        from .model import get_model
+        self.out = get_model().evaluate_readout(self.readout_inputs(present, env, C), self.P)
