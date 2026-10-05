@@ -9,3 +9,16 @@ Status: design draft, not publishable.
 - `sandbox/`: JS designer (to be added)
 
 Build order: mindcore + snapshot + golden traces, world providers, adapter/renderer/tools, appraisers, scheduler, sampling, bridge.
+
+## Development shell
+
+This repo includes a Nix + direnv dev shell for Python, Node and Playwright.
+
+1. Install `nix` and `direnv`.
+2. Run `direnv allow` in the repo root.
+3. Use:
+   - `python -m pytest -q`
+   - `python tools/build_html.py`
+   - `python /tmp/smoke.py` or your own Playwright checks
+
+The shell provides Python 3.12, `pytest`, `playwright`, Node 20 and a prewired Playwright browser path.
