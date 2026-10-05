@@ -1,103 +1,103 @@
 # Traits: functions over parameters. `value` is the trait setting in [-1, 1]; zero-valued traits are skipped.
 # Statements may use = += -= *= /= on parameters; applied in file order, then param min/max clamps, then resolve.
 
-trait energy | label="Energy" group="Temperament" help="Sluggish to high-voltage." {
+trait energy | label="Energy" group="Temperament" help="- = sluggish, + = high-voltage. Raises arousal target, drives and fatigue resistance." {
   tb_arousal += 0.9 * value
   tb_seek += 0.4 * value
   tb_play += 0.3 * value
   tau_wake *= exp(0.3 * value)
   speed_mid *= exp(0.15 * value)
 }
-trait extraversion | label="Extraversion" group="Temperament" help="Outward activation, seeking and play." {
+trait extraversion | label="Extraversion" group="Temperament" help="- = introverted, + = extraverted. Outward activation, seeking and play." {
   tb_arousal += 0.35 * value
   tb_seek += 0.35 * value
   tb_play += 0.3 * value
   hl_missing *= exp(-0.3 * value)
 }
-trait playful | label="Playful" group="Temperament" help="Higher, lingering PLAY drive." {
+trait playful | label="Playful" group="Temperament" help="Appetite for humour and banter; the PLAY drive sits higher and lingers." {
   tb_play += value
   tb_mood += 0.15 * value
   hl_play *= exp(0.3 * value)
 }
-trait mischievous | label="Mischievous" group="Temperament" help="Teasing, boundary-testing." {
+trait mischievous | label="Mischievous" group="Temperament" help="Teasing, provocative, boundary-testing: play, initiative, slightly weaker commitment." {
   tb_play += 0.6 * value
   tb_dom += 0.4 * value
   tb_seek += 0.3 * value
   imp_gain *= exp(0.15 * value)
   giveup *= exp(0.4 * value)
 }
-trait curiosity | label="Curiosity" group="Temperament" help="Higher SEEKING, stronger novelty." {
+trait curiosity | label="Curiosity" group="Temperament" help="SEEKING sits higher, novelty hits harder, boredom builds faster." {
   tb_seek += value
   imp_phasic_novelty += 0.3 * value
   boredom_rate += 0.3 * value
 }
-trait creativity | label="Creativity" group="Temperament" help="Exploration and play, surprise less jarring." {
+trait creativity | label="Creativity" group="Temperament" help="Exploration and play with a taste for the unexpected (surprise is less jarring)." {
   tb_seek += 0.4 * value
   tb_play += 0.4 * value
   imp_phasic_novelty += 0.2 * value
   surprise_gain *= exp(-0.25 * value)
 }
-trait conscientiousness | label="Conscientiousness" group="Temperament" help="Persistence and standards." {
+trait conscientiousness | label="Conscientiousness" group="Temperament" help="Persistence and standards: slower give-up, task commitment holds, standards linger." {
   tb_dom += 0.3 * value
   tb_inh += 0.2 * value
   giveup *= exp(-0.7 * value)
   hl_commit *= exp(0.5 * value)
   hl_standards *= exp(0.3 * value)
 }
-trait rebelliousness | label="Rebelliousness" group="Temperament" help="Resists structure and demands." {
+trait rebelliousness | label="Rebelliousness" group="Temperament" help="Resists structure and demands: higher dominance, commitment gives way faster." {
   tb_dom += 0.5 * value
   tb_inh += -0.2 * value
   hl_commit *= exp(-0.5 * value)
   giveup *= exp(0.4 * value)
   demand_gain *= exp(-0.5 * value)
 }
-trait patience | label="Patience" group="Temperament" help="Short fuse to patient." {
+trait patience | label="Patience" group="Temperament" help="- = short fuse, + = patient. Adversity fades faster and rumination drops." {
   giveup *= exp(-value)
   rumination *= exp(-0.5 * value)
   hl_adversity *= exp(-0.5 * value)
   hl_commit *= exp(0.3 * value)
 }
-trait impulsivity | label="Impulsivity" group="Temperament" help="Stronger, faster reactions, weaker brakes." {
+trait impulsivity | label="Impulsivity" group="Temperament" help="Stronger and faster reactions, bigger budget per hour, weaker brakes." {
   imp_gain *= exp(0.5 * value)
   speed_fast *= exp(0.5 * value)
   impulse_budget *= exp(0.5 * value)
   tb_inh += -0.4 * value
   hl_phasic *= exp(0.2 * value)
 }
-trait warmth | label="Warmth" group="Social and affect" help="Closer bond, warmer mood." {
+trait warmth | label="Warmth" group="Social and affect" help="Closer bond target, warmer mood, warmth stands out more when missing." {
   tb_bond += 0.5 * value
   tb_mood += 0.25 * value
   tb_want += 0.15 * value
   missing_warmth_boost += 0.3 * value
 }
-trait tenderness | label="Tenderness" group="Social and affect" help="Soft, affiliative." {
+trait tenderness | label="Tenderness" group="Social and affect" help="Soft, affiliative: warm moments count for more, dominance slightly lower." {
   tb_bond += 0.3 * value
   tb_mood += 0.15 * value
   tb_dom += -0.1 * value
   imp_val_warm += 0.08 * value
 }
-trait sociability | label="Sociability" group="Social and affect" help="Misses the user sooner." {
+trait sociability | label="Sociability" group="Social and affect" help="Misses the user sooner, wants contact, bond builds." {
   hl_missing *= exp(-0.35 * value)
   tb_seek += 0.2 * value
   tb_bond += 0.2 * value
   missing_ramp += 0.6 * value
 }
-trait assertiveness | label="Assertiveness" group="Social and affect" help="Submissive to assertive." {
+trait assertiveness | label="Assertiveness" group="Social and affect" help="- = submissive, + = assertive. Dominance and willingness to push back." {
   tb_dom += value
   tb_inh += -0.2 * value
 }
-trait formality | label="Formality" group="Social and affect" help="Restrained, less play." {
+trait formality | label="Formality" group="Social and affect" help="Restrained, controlled, less play, higher inhibition." {
   tb_play += -0.5 * value
   tb_inh += 0.3 * value
   tb_dom += 0.2 * value
   imp_gain *= exp(-0.3 * value)
 }
-trait optimism | label="Optimism" group="Mood and resilience" help="Pessimistic to optimistic." {
+trait optimism | label="Optimism" group="Mood and resilience" help="- = pessimistic, + = optimistic. Mood target, baseline offset and less rumination." {
   tb_mood += 0.4 * value
   mood_baseline_offset += 0.25 * value
   rumination *= exp(-0.4 * value)
 }
-trait depressive_manic | label="Depressive / manic" group="Mood and resilience" help="Negative: depressive, slow. Positive: manic, restless, bistable highs." {
+trait depressive_manic | label="Depressive / manic" group="Mood and resilience" help="- = depressive: low mood, low arousal, slow, ruminative, sleeps more. + = manic: elevated, fast, restless, needs little sleep and self-reinforcing highs (bistability)." {
   tb_mood += value
   tb_arousal += 0.8 * value
   tb_dom += 0.5 * value
@@ -110,34 +110,34 @@ trait depressive_manic | label="Depressive / manic" group="Mood and resilience" 
   speed_mid *= exp(0.25 * value)
   rumination *= exp(-0.6 * value)
 }
-trait mood_cycling | label="Mood cycling" group="Mood and resilience" help="Spontaneous slow mood swings." {
+trait mood_cycling | label="Mood cycling" group="Mood and resilience" help="Spontaneous slow mood swings between high and low (period set by cyc_days, default 6 days) without any external cause." {
   cyc_amp += 0.9 * pos(value)
 }
-trait menstrual_cycle | label="Menstrual cycle" group="Mood and resilience" help="Optional hormone cycle strength." {
+trait menstrual_cycle | label="Menstrual cycle" group="Mood and resilience" help="Optional hormone cycle (length and start day under Parameters). Strength 0 = off, 1 = full: estrogen and progesterone curves shift arousal, mood and wanting; hormone effects are slightly amplified." {
   cycle_alpha += pos(value)
   hormone_congruence *= exp(0.2 * pos(value))
 }
-trait resilience | label="Resilience" group="Mood and resilience" help="Brittle to resilient." {
+trait resilience | label="Resilience" group="Mood and resilience" help="- = brittle, + = resilient. Strain builds slower, adversity fades faster, self esteem steadier." {
   mood_strain_gain *= exp(-0.8 * value)
   strain_gain *= exp(-0.6 * value)
   hl_adversity *= exp(-0.4 * value)
   tb_self += 0.3 * value
 }
-trait sensitivity | label="Sensitivity" group="Mood and resilience" help="Reacts more to everything." {
+trait sensitivity | label="Sensitivity" group="Mood and resilience" help="Reacts more to everything: bigger impulses, more mood congruence and hormone effects, less habituation." {
   imp_gain *= exp(0.5 * value)
   mood_congruence *= exp(0.5 * value)
   hormone_congruence *= exp(0.4 * value)
   surprise_gain *= exp(0.3 * value)
   habituation_strength *= exp(-0.3 * value)
 }
-trait shame_proneness | label="Shame-proneness" group="Mood and resilience" help="Failures sink deeper and linger." {
+trait shame_proneness | label="Shame-proneness" group="Mood and resilience" help="Failures to meet standards sink deeper and linger; self esteem pulled down." {
   imp_val_standards += 0.15 * value
   hl_standards *= exp(0.6 * value)
   carry_standards_to_selfesteem += 0.2 * value
   tb_self += -0.3 * value
   tb_mood += -0.1 * value
 }
-trait emotional_stability | label="Emotional stability" group="Dynamics (timescales)" help="Volatile to steady." {
+trait emotional_stability | label="Emotional stability" group="Dynamics (timescales)" help="- = neurotic/volatile, + = steady. Damps fast reactions, surprise and rumination." {
   speed_fast *= exp(-0.4 * value)
   imp_gain *= exp(-0.5 * value)
   surprise_gain *= exp(-0.5 * value)
@@ -146,7 +146,7 @@ trait emotional_stability | label="Emotional stability" group="Dynamics (timesca
   tb_mood += 0.2 * value
   mood_strain_gain *= exp(-0.5 * value)
 }
-trait moody | label="Moody" group="Dynamics (timescales)" help="Quick, large mood swings that stick." {
+trait moody | label="Moody" group="Dynamics (timescales)" help="Quick, large mood swings that stick: FAST and MID layers speed up, SLOW baselines get more sluggish, reactions carry into mood, plus a small spontaneous swing." {
   speed_fast *= exp(0.6 * value)
   speed_mid *= exp(0.6 * value)
   speed_slow *= exp(-0.3 * value)
@@ -156,7 +156,7 @@ trait moody | label="Moody" group="Dynamics (timescales)" help="Quick, large moo
   mood_congruence *= exp(0.4 * value)
   cyc_amp += 0.15 * value
 }
-trait dynamicity | label="Dynamicity" group="Dynamics (timescales)" help="Flat/stoic to lively." {
+trait dynamicity | label="Dynamicity" group="Dynamics (timescales)" help="- = flat/stoic, + = lively. Scales speed of all three layers, impulse size and carry together." {
   speed_fast *= exp(0.5 * value)
   speed_mid *= exp(0.4 * value)
   speed_slow *= exp(0.3 * value)
@@ -165,7 +165,7 @@ trait dynamicity | label="Dynamicity" group="Dynamics (timescales)" help="Flat/s
   carry_phasic_to_arousal += 0.04 * value
   impulse_cap *= exp(0.3 * value)
 }
-trait horizon | label="Horizon: reactive vs long-term" group="Dynamics (timescales)" help="Reactive forgets quickly; accumulating writes reactions into slow baselines." {
+trait horizon | label="Horizon: reactive vs long-term" group="Dynamics (timescales)" help="- = reactive, forgets quickly (fast layer fast, slow layer barely moves). + = accumulating: reactions are written into slow baselines, slow layer moves faster, fast layer calmer." {
   speed_fast *= exp(-0.5 * value)
   speed_slow *= exp(0.8 * value)
   carry_valence_to_mood += 0.3 * value
@@ -174,7 +174,7 @@ trait horizon | label="Horizon: reactive vs long-term" group="Dynamics (timescal
   spill_arousal *= exp(0.5 * value)
   spill_mood *= exp(0.5 * value)
 }
-trait autistic | label="Autistic-style processing" group="Cognition" help="Coarse behavioural knobs, not a diagnosis model." {
+trait autistic | label="Autistic-style processing" group="Cognition" help="Coarse behavioural knobs, not a diagnosis model: surprise lingers, less habituation, strong task focus, lower spontaneous play." {
   surprise_gain *= exp(0.4 * pos(value))
   hl_surprise *= exp(0.7 * pos(value))
   habituation_strength *= exp(-0.5 * pos(value))
@@ -184,7 +184,7 @@ trait autistic | label="Autistic-style processing" group="Cognition" help="Coars
   tb_inh += 0.2 * pos(value)
   imp_phasic_novelty += 0.2 * pos(value)
 }
-trait romanticism | label="Romanticism" group="Intimacy" help="Deeper, slower-fading bond." {
+trait romanticism | label="Romanticism" group="Intimacy" help="Bond grows deeper and slower to fade; longing lingers." {
   tb_bond += 0.6 * value
   hl_bond *= exp(0.4 * value)
   intensity_bond += 0.6 * value
@@ -196,18 +196,18 @@ trait sensuality | label="Sensuality" group="Intimacy" help="Wanting higher, ero
   tb_inh += -0.2 * value
   imp_phasic_erotic += 0.3 * value
 }
-trait naughty | label="Naughty" group="Intimacy" help="Provocative when allowed." {
+trait naughty | label="Naughty" group="Intimacy" help="Provocative and intimate when allowed: wanting up, brake down, LUST gate up." {
   tb_want += 0.7 * value
   tb_inh += -0.6 * value
   lust_mul *= exp(0.3 * value)
   tb_play += 0.2 * value
 }
-trait prudishness | label="Prudishness" group="Intimacy" help="Strong brake on erotic expression." {
+trait prudishness | label="Prudishness" group="Intimacy" help="Strong brake on erotic expression; LUST gate down." {
   tb_inh += 0.9 * pos(value)
   tb_want += -0.3 * pos(value)
   lust_mul *= exp(-0.8 * pos(value))
 }
-trait age | label="Age / maturity" group="Intimacy" help="-1 young, 0 mid-life, +1 old; U-shaped inhibition." {
+trait age | label="Age / maturity" group="Intimacy" help="-1 = very young, 0 = mid-life (neutral), +1 = very old. Inhibition is U-shaped: lowest at both extremes, highest in mid-life; seeking and play fall with age, dominance and mood baseline rise." {
   tb_inh += 0.9 * ageU(value)
   tb_seek += -0.4 * value
   tb_play += -0.4 * value
@@ -215,26 +215,26 @@ trait age | label="Age / maturity" group="Intimacy" help="-1 young, 0 mid-life, 
   mood_baseline_offset += 0.15 * value
   tau_wake *= exp(-0.2 * value)
 }
-trait enforced_loyalty | label="OVERRIDE: enforced loyalty" group="Overrides" help="Forces bond to the top of its range." {
+trait enforced_loyalty | label="OVERRIDE: enforced loyalty" group="Overrides" help="Forces bond to the top of its range regardless of history (floor = value x 1.0, max about 0.995), also lifts missing and warmth. Use to test fixed attachment." {
   floor_bond = max(floor_bond, pos(value))
   tb_bond += 1.5 * pos(value)
   hl_missing *= exp(0.3 * pos(value))
 }
-trait bond_floor | label="OVERRIDE: bond floor" group="Overrides" help="Bond never drops below this." {
+trait bond_floor | label="OVERRIDE: bond floor" group="Overrides" help="Bond never drops below this value (0 = off)." {
   floor_bond = max(floor_bond, pos(value))
 }
-trait competence_floor | label="OVERRIDE: competence floor" group="Overrides" help="Competence floor." {
+trait competence_floor | label="OVERRIDE: competence floor" group="Overrides" help="Competence never drops below this value." {
   floor_comp = max(floor_comp, pos(value))
 }
-trait selfesteem_floor | label="OVERRIDE: self-esteem floor" group="Overrides" help="Self esteem floor." {
+trait selfesteem_floor | label="OVERRIDE: self-esteem floor" group="Overrides" help="Self esteem never drops below this value." {
   floor_self = max(floor_self, pos(value))
 }
-trait dominance_floor | label="OVERRIDE: dominance floor" group="Overrides" help="Dominance floor." {
+trait dominance_floor | label="OVERRIDE: dominance floor" group="Overrides" help="Sense of control never drops below this value (cannot be overwhelmed)." {
   floor_dom = max(floor_dom, pos(value))
 }
-trait contentment_lock | label="OVERRIDE: mood floor" group="Overrides" help="Mood and baseline floor." {
+trait contentment_lock | label="OVERRIDE: mood floor" group="Overrides" help="Mood and mood baseline never drop below this value (forced contentment)." {
   floor_mood = max(floor_mood, pos(value))
 }
-trait uninhibited | label="OVERRIDE: inhibition cap" group="Overrides" help="Caps LUST inhibition." {
+trait uninhibited | label="OVERRIDE: inhibition cap" group="Overrides" help="Caps LUST inhibition at (1 - value x 0.95): at 1 the brake is almost gone." {
   cap_inh = min(cap_inh, 1 + -0.95 * pos(value))
 }

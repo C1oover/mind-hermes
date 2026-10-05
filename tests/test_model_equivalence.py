@@ -21,7 +21,9 @@ def test_params_match_defaults():
 def test_trait_metadata_matches():
     assert list(M.traits) == list(old.TRAITS)
     for n, t in old.TRAITS.items():
-        assert M.trait_info()[n] == {"label": t["label"], "group": t["group"], "help": t["help"]}
+        info = M.trait_info()[n]
+        assert (info["label"], info["group"]) == (t["label"], t["group"])
+        assert info["help"]
 
 
 def test_single_traits_match_legacy():

@@ -6,6 +6,22 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
+  function unparse(e) {
+    const atom = (x) => (['num', 'var', 'call'].includes(x[0]) ? unparse(x) : '(' + unparse(x) + ')');
+    switch (e[0]) {
+      case 'num': return String(e[1]);
+      case 'var': return e[1];
+      case 'neg': return '-' + atom(e[1]);
+      case 'bin': return atom(e[2]) + ' ' + e[1] + ' ' + atom(e[3]);
+      case 'cmp': return atom(e[2]) + ' ' + e[1] + ' ' + atom(e[3]);
+      case 'and': case 'or': return atom(e[1]) + ' ' + e[0] + ' ' + atom(e[2]);
+      case 'not': return 'not ' + atom(e[1]);
+      case 'call': return e[1] + '(' + e[2].map(unparse).join(', ') + ')';
+      case 'if': return 'if ' + unparse(e[1]) + ' then ' + unparse(e[2]) + ' else ' + unparse(e[3]);
+      default: return '?';
+    }
+  }
+
   class ModelError extends Error {
     constructor(msg, line, origin) {
       super((origin || '<model>') + (line ? ':' + line : '') + ': ' + msg);
@@ -335,6 +351,11 @@
       for (const [n, t] of Object.entries(this.traits)) {
         out[n] = { label: t.meta.label !== undefined ? t.meta.label : n, group: t.meta.group || '', help: t.meta.help || '' };
       }
+      return out;
+    }
+    traitEffects() {
+      const out = {};
+      for (const [n, t] of Object.entries(this.traits)) out[n] = t.stmts.map((st) => st.name + ' ' + st.op + ' ' + unparse(st.expr));
       return out;
     }
     defaultPersona() {

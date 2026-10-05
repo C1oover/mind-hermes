@@ -19,7 +19,7 @@ const summary = (r) => {
   return o;
 };
 const out = {
-  defs: A.PARAM_DEFS, traits: keys, persona0: A.defaultPersona(),
+  defs: A.PARAM_DEFS, traits: keys, persona0: A.defaultPersona(), fx: Object.fromEntries(keys.map((k) => [k, A.TRAITS[k].fx])),
   params: personas.map((p) => A.effectiveParams(P, p)),
   sim: personas.filter((_, i) => i % 9 === 0).map((p) => summary(A.simulate(A.defaultCfg(), A.effectiveParams(P, p), 5))),
 };

@@ -23,6 +23,7 @@ def block():
         "const PARAM_DEFS=MODEL.paramTable().map(r=>[r.key,r.label,r.default,r.step||0.01,r.group]);\n"
         "function defaultParams(){const P={};for(const r of PARAM_DEFS)P[r[0]]=r[2];return P;}\n"
         "const TRAITS=MODEL.traitInfo();\n"
+        "{const FX=MODEL.traitEffects();for(const k in TRAITS)TRAITS[k].fx=FX[k];}\n"
         "const PERSONA_KEYS=Object.keys(TRAITS);\n"
         "function defaultPersona(){return MODEL.defaultPersona();}\n"
         "// lust_gate is set from cfg.lustGate * lust_mul inside simulate(), so the UI keeps the base value here\n"
