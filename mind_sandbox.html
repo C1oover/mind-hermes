@@ -34,24 +34,914 @@ const ALIAS={fatigue:'sleep_pressure',tiredness:'sleep_pressure',arousal:'arousa
 const CODES={tool_success:{succ:1,eg:.05,es:.08},tool_failure:{fail:1,eg:-.4,es:-.1,n:.3},praise:{eg:.5,ew:.5,es:.3},conflict:{eg:-.5,ew:-.7,es:-.2,th:.3},joke:{n:.4,ep:.6,ew:.3},flirt:{ew:.3,el:.7},danger:{th:.8,n:.6},surprise:{n:.7},warm_moment:{eg:.5,ew:.6,ep:.6}};
 const CTRLV=['arousal','seeking','play','lust_wanting','dominance'];
 const CTRL_DEF={arousal:{comfort:.6,drain:.4,rec:300,rebound:2.5,shield:.8,deriv:6},seeking:{comfort:.4,drain:.5,rec:240,rebound:1.2,shield:.4,deriv:3},play:{comfort:.3,drain:.5,rec:240,rebound:1,shield:0,deriv:2},lust_wanting:{comfort:.3,drain:.8,rec:180,rebound:1.2,shield:0,deriv:2},dominance:{comfort:.55,drain:.3,rec:360,rebound:1,shield:.6,deriv:2}};
-const PARAM_DEFS=[];
-function def(g,rows){for(const r of rows)PARAM_DEFS.push([r[0],r[1],r[2],r[3]||0.01,g]);}
-def('Cross-timescale coupling',[['speed_fast','FAST layer speed x',1,.1],['speed_mid','MID layer speed x',1,.1],['speed_slow','SLOW layer speed x',1,.1],['carry_valence_to_mood','fast valence -> mood carry',.4,.05],['carry_phasic_to_arousal','fast arousal burst -> arousal carry',.08,.01],['carry_standards_to_selfesteem','standards impulse -> self esteem carry',.15,.05],['slow_follow_mood','mood baseline follows 24h mood',.35,.05],['slow_follow_arousal','arousal baseline follows 24h arousal',.25,.05],['mood_avg_hl','24h average half-life (min)',1440,60]]);
-def('Half-lives (min)',[['hl_phasic','phasic arousal',4,.5],['hl_valence_reaction','valence reaction',8,.5],['hl_threat','threat trace',10,.5],['hl_surprise','surprise trace',20,1],['hl_adversity','adversity trace',20,1],['hl_recent_success','recent success',30,1],['hl_arousal_tonic','arousal (tonic)',60,5],['hl_mood','mood',360,10],['hl_dominance','dominance',180,10],['hl_standards','standards met',720,30],['hl_seeking','seeking',90,5],['hl_play','play',120,5],['hl_wanting','lust wanting',45,5],['hl_inhibition','lust inhibition',120,5],['hl_missing','missing user',180,10],['hl_commit','task commitment',15,1],['tau_boredom','boredom time constant',130,5],['hl_bond','bond',14400,500],['hl_competence','competence',2880,100],['hl_self_esteem','self esteem',20160,500],['hl_arousal_baseline','arousal baseline',2160,100],['hl_mood_baseline','mood baseline',4320,100]]);
-def('Impulse sizes',[['imp_phasic_novelty','arousal <- novelty',.5],['imp_phasic_threat','arousal <- threat',.9],['imp_phasic_erotic','arousal <- erotic cue',.4],['imp_phasic_goal','arousal <- |goal|',.2],['imp_phasic_anticipation','arousal <- anticipation',.3],['imp_val_goal','valence <- goal',.15],['imp_val_warm','valence <- warmth',.1],['imp_val_standards','valence <- standards',.1],['reunion_relief','valence <- reunion',.6],['impulse_cap','cap per step (latent)',.8],['impulse_budget','budget per hour (latent)',1.5,.1],['appraisal_saturation','per-step saturation',3,.1],['surprise_gain','surprise per novelty/failure',.3,.05]]);
-def('Conditioning',[['habituation_strength','habituation strength',.15],['habituation_half_life','habituation half-life',30,1],['mood_congruence','mood congruence',.3],['hormone_congruence','hormone congruence',.2],['missing_warmth_boost','warmth boost when missing',.5],['intensity_bond','intense warmth bonds more',1]]);
-def('Freeform impulses',[['freeform_reference','reference (delta covering 76%)',5,.5],['hammer_scale','hammer scale',1,.1],['hammer_half_life','hammer recovery (min)',30,1]]);
-def('Gates and blunting',[['gate_floor_phasic','phasic gate floor',.1],['phasic_scale','phasic scale',3,.1],['blunting','sleep-debt blunting',1.2,.1],['rumination','rumination',.5],['giveup','give-up rate',.5]]);
-def('Controller master',[['ctl_on','controller on (1/0)',1,1],['demand_gain','task demand -> arousal',1.6,.1]]);
-for(const v of CTRLV){const d=CTRL_DEF[v];def('Controller: '+v,[['ctl_'+v+'_comfort','comfort level',d.comfort],['ctl_'+v+'_drain','reserve drain / h',d.drain],['ctl_'+v+'_rec','recovery half-life (min)',d.rec,10],['ctl_'+v+'_rebound','rebound depth',d.rebound,.1],['ctl_'+v+'_shield','task shield',d.shield,.05],['ctl_'+v+'_deriv','derivative damping',d.deriv,.5]]);}
-def('Strain and spillover',[['strain_threshold','arousal strain threshold',.75],['strain_gain','arousal strain gain',1.5,.1],['strain_hl','arousal strain half-life',720,30],['strain_to_baseline','strain -> arousal baseline',.35],['mood_strain_threshold','low-mood strain threshold',.4],['mood_strain_gain','low-mood strain gain',1,.1],['mood_strain_to_baseline','strain -> mood baseline',.6],['spill_arousal','spill phasic -> arousal baseline',.15],['spill_mood','spill reaction -> mood baseline',.1],['spill_debt','spill wake -> sleep debt',.002,.001],['spill_daily_cap','spill daily cap (latent)',.6,.05]]);
-def('Drives and targets',[['boredom_rate','boredom build rate',.8],['reunion_keep','missing kept after reunion',.4],['missing_ramp','missing ramp',2,.1],['detach_start','detachment starts (min)',4320,60],['detach_tau','detachment time constant',2880,60],['bond_baseline','bond baseline',.45],['circ_arousal','circadian -> arousal',.7,.05],['sleep_pressure_arousal','sleep pressure -> arousal',1.4,.05],['ultradian_amp','ultradian amplitude',.08,.01],['weather_mood','weather -> mood',.15],['mood_baseline_offset','mood baseline offset',.25],['bistable','mood bistability',0,.01],['wanting_deprivation','wanting <- time since warmth',.3,.05],['deprivation_scale','deprivation time scale (min)',2880,60]]);
-def('Body and clock',[['tau_wake','wake time constant (min)',1092,30],['tau_sleep','sleep time constant (min)',252,10],['load_fatigue','load -> fatigue',.0015,.0005],['stress_fatigue','stress -> fatigue',.0008,.0005],['light_fatigue','dark -> fatigue',.3],['moon_sleep','moon -> sleep',.3],['clock_anchor','clock anchor (h)',15,.5],['clock_period','clock period (h)',24,.1],['phase_gain','phase shift gain',.0015,.0005],['anchor_pull','anchor pull',.01,.005],['sleep_threshold','sleep threshold',-.3,.05],['sleep_standards_boost','sleep heals standards',1,1]]);
-def('Environment',[['lat','latitude',48.2,.5],['start_doy','start day of year',278,1],['cloud','cloud cover',.4,.05],['pressure','pressure (hPa)',1013,1],['weather_swing','pressure swing (hPa)',0,1],['moon_on','moon effect',1,.1],['moon_phase0','lunar age at start (d)',5,.5]]);
-def('Persona (cycle timing)',[['cycle_alpha','cycle strength (0 = off; set by trait Menstrual cycle)',0,.1],['cycle_length','cycle length (days)',28,1],['cycle_start_day','cycle day at start',3,1]]);
-def('Trait hooks (advanced)',[['tb_arousal','arousal target bias (logit)',0,.1],['tb_mood','mood target bias',0,.1],['tb_dom','dominance target bias (logit)',0,.1],['tb_seek','seeking target bias (logit)',0,.1],['tb_play','play target bias (logit)',0,.1],['tb_want','wanting target bias (logit)',0,.1],['tb_inh','inhibition target bias (logit)',0,.1],['tb_bond','bond target bias (logit)',0,.1],['tb_comp','competence target bias (logit)',0,.1],['tb_self','self esteem target bias (logit)',0,.1],['imp_gain','all appraisal impulses x',1,.1],['lust_mul','LUST gate x',1,.1],['cyc_amp','spontaneous mood cycle amplitude',0,.05],['cyc_days','spontaneous cycle period (days)',6,.5],['floor_bond','FLOOR bond (0 = off)',0,.05],['floor_comp','FLOOR competence (0 = off)',0,.05],['floor_self','FLOOR self esteem (0 = off)',0,.05],['floor_dom','FLOOR dominance (0 = off)',0,.05],['floor_mood','FLOOR mood and baseline (0 = off)',0,.05],['cap_inh','CAP lust inhibition (1 = off)',1,.05]]);
-def('Top-level',[['lust_gate','LUST impulse gate (0-1)',1,.1]]);
+//MINDMODEL_START generated by tools/build_html.py from web/mindmodel.js and mindcore/model/*.mind; edit those, not this block
+/* Model language for the web UI: a port of mindcore/dsl.py + mindcore/model.py (params, functions, traits, resolve, readout).
+   Works in browsers (window.MindModel) and Node (require). No eval. Parity with Python is checked by tests/test_js_parity.py. */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.MindModel = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  class ModelError extends Error {
+    constructor(msg, line, origin) {
+      super((origin || '<model>') + (line ? ':' + line : '') + ': ' + msg);
+      this.name = 'ModelError';
+    }
+  }
+
+  function pyrepr(s) {
+    s = String(s);
+    const q = s.includes("'") && !s.includes('"') ? '"' : "'";
+    let out = s.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t');
+    if (q === "'") out = out.replace(/'/g, "\\'");
+    return q + out + q;
+  }
+
+  const TOKEN = /([ \t\r]+|#[^\n]*)|(\n|;)|((?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)|("[^"\n]*")|([A-Za-z_][A-Za-z_0-9]*)|(\+=|-=|\*=|\/=|==|!=|<=|>=|[-+*\/=<>(){},|])/y;
+  const KINDS = [null, 'ws', 'nl', 'num', 'str', 'name', 'op'];
+  const ASSIGN = ['=', '+=', '-=', '*=', '/='];
+
+  function tokenize(text, origin) {
+    const toks = [];
+    let pos = 0, line = 1;
+    while (pos < text.length) {
+      TOKEN.lastIndex = pos;
+      const m = TOKEN.exec(text);
+      if (!m) throw new ModelError('unexpected character ' + pyrepr(text[pos]), line, origin);
+      let k = 1;
+      while (m[k] === undefined) k++;
+      const kind = KINDS[k], s = m[0];
+      if (kind === 'nl') {
+        toks.push(['nl', s, line]);
+        if (s === '\n') line++;
+      } else if (kind !== 'ws') toks.push([kind, s, line]);
+      pos = TOKEN.lastIndex;
+    }
+    toks.push(['eof', '', line]);
+    return toks;
+  }
+
+  class Parser {
+    constructor(toks, origin) { this.t = toks; this.i = 0; this.origin = origin; }
+    peek(k = 0) { return this.t[Math.min(this.i + k, this.t.length - 1)]; }
+    next() { const t = this.t[Math.min(this.i, this.t.length - 1)]; this.i++; return t; }
+    err(msg, tok) { tok = tok || this.peek(); throw new ModelError(msg, tok[2], this.origin); }
+    is(tok, kind, text) { return tok[0] === kind && (text === undefined || tok[1] === text); }
+    accept(kind, text) { return this.is(this.peek(), kind, text) ? this.next() : null; }
+    expect(kind, text) {
+      const t = this.accept(kind, text);
+      if (!t) this.err('expected ' + (text || kind) + ', got ' + pyrepr(this.peek()[1] || 'end of file'));
+      return t;
+    }
+    skipNl() { while (this.peek()[0] === 'nl') this.i++; }
+    endStmt() {
+      if (this.peek()[0] !== 'nl' && this.peek()[0] !== 'eof') this.err('unexpected ' + pyrepr(this.peek()[1]));
+      this.skipNl();
+    }
+    meta() {
+      const out = {};
+      while (this.peek()[0] === 'name' && this.is(this.peek(1), 'op', '=')) {
+        const key = this.next()[1];
+        this.next();
+        const [kind, s] = this.next();
+        if (kind === 'str') out[key] = s.slice(1, -1);
+        else if (kind === 'num') out[key] = parseFloat(s);
+        else if (kind === 'name' && (s === 'true' || s === 'false')) out[key] = s === 'true';
+        else this.err('bad value for ' + key);
+      }
+      return out;
+    }
+    expr() {
+      if (this.is(this.peek(), 'name', 'if')) {
+        this.next();
+        const c = this.expr();
+        this.expect('name', 'then');
+        const a = this.expr();
+        this.expect('name', 'else');
+        return ['if', c, a, this.expr()];
+      }
+      let a = this.andexpr();
+      while (this.accept('name', 'or')) a = ['or', a, this.andexpr()];
+      return a;
+    }
+    andexpr() {
+      let a = this.notexpr();
+      while (this.accept('name', 'and')) a = ['and', a, this.notexpr()];
+      return a;
+    }
+    notexpr() {
+      if (this.accept('name', 'not')) return ['not', this.notexpr()];
+      const a = this.arith();
+      const t = this.peek();
+      if (t[0] === 'op' && ['<', '>', '<=', '>=', '==', '!='].includes(t[1])) {
+        this.next();
+        return ['cmp', t[1], a, this.arith()];
+      }
+      return a;
+    }
+    arith() {
+      let a = this.term();
+      while (this.is(this.peek(), 'op', '+') || this.is(this.peek(), 'op', '-')) {
+        const [, op, ln] = this.next();
+        a = ['bin', op, a, this.term(), ln];
+      }
+      return a;
+    }
+    term() {
+      let a = this.unary();
+      while (this.is(this.peek(), 'op', '*') || this.is(this.peek(), 'op', '/')) {
+        const [, op, ln] = this.next();
+        a = ['bin', op, a, this.unary(), ln];
+      }
+      return a;
+    }
+    unary() {
+      if (this.accept('op', '-')) return ['neg', this.unary()];
+      this.accept('op', '+');
+      return this.atom();
+    }
+    atom() {
+      const t = this.next();
+      const [kind, s, ln] = t;
+      if (kind === 'num') return ['num', parseFloat(s)];
+      if (kind === 'name') {
+        if (this.accept('op', '(')) {
+          const args = [];
+          if (!this.accept('op', ')')) {
+            args.push(this.expr());
+            while (this.accept('op', ',')) args.push(this.expr());
+            this.expect('op', ')');
+          }
+          return ['call', s, args, ln];
+        }
+        return ['var', s, ln];
+      }
+      if (kind === 'op' && s === '(') {
+        const e = this.expr();
+        this.expect('op', ')');
+        return e;
+      }
+      return this.err('expected a value, got ' + pyrepr(s || 'end of file'), t);
+    }
+    stmt() {
+      const nameTok = this.expect('name');
+      const tok = this.next();
+      if (tok[0] !== 'op' || !ASSIGN.includes(tok[1])) this.err('expected one of = += -= *= /=', tok);
+      return { name: nameTok[1], op: tok[1], expr: this.expr(), line: nameTok[2], origin: this.origin };
+    }
+    block() {
+      this.expect('op', '{');
+      const out = [];
+      this.skipNl();
+      while (!this.accept('op', '}')) {
+        out.push(this.stmt());
+        if (!this.is(this.peek(), 'op', '}') && this.peek()[0] !== 'nl') this.err('unexpected ' + pyrepr(this.peek()[1]));
+        this.skipNl();
+      }
+      return out;
+    }
+  }
+
+  const WORDS = ['param', 'def', 'trait', 'resolve', 'readout', 'group'];
+
+  function parse(text, origin) {
+    origin = origin || '<model>';
+    const p = new Parser(tokenize(text, origin), origin);
+    const out = { params: [], defs: [], traits: [], resolve: [], readout: [] };
+    let group = null;
+    p.skipNl();
+    while (p.peek()[0] !== 'eof') {
+      const tok = p.next();
+      const word = tok[1], ln = tok[2];
+      if (tok[0] !== 'name' || !WORDS.includes(word)) p.err('expected param, def, trait, resolve, readout or group, got ' + pyrepr(word), tok);
+      if (word === 'group') {
+        group = p.expect('str')[1].slice(1, -1);
+        p.endStmt();
+      } else if (word === 'param') {
+        const name = p.expect('name')[1];
+        p.expect('op', '=');
+        const e = p.expr();
+        const meta = p.accept('op', '|') ? p.meta() : {};
+        if (group && !('group' in meta)) meta.group = group;
+        out.params.push({ name, expr: e, meta, line: ln, origin });
+        p.endStmt();
+      } else if (word === 'def') {
+        const name = p.expect('name')[1];
+        p.expect('op', '(');
+        const params = [];
+        if (!p.accept('op', ')')) {
+          for (;;) {
+            const pn = p.expect('name')[1];
+            params.push([pn, p.accept('op', '=') ? p.expr() : null]);
+            if (!p.accept('op', ',')) break;
+          }
+          p.expect('op', ')');
+        }
+        p.expect('op', '=');
+        out.defs.push({ name, params, body: p.expr(), line: ln, origin });
+        p.endStmt();
+      } else if (word === 'trait') {
+        const name = p.expect('name')[1];
+        const meta = p.accept('op', '|') ? p.meta() : {};
+        out.traits.push({ name, meta, stmts: p.block(), line: ln, origin });
+        p.endStmt();
+      } else {
+        out[word === 'resolve' ? 'resolve' : 'readout'].push(...p.block());
+        p.endStmt();
+      }
+    }
+    return out;
+  }
+
+  const dom = (v) => { if (!Number.isFinite(v)) throw new Error('math domain error'); return v; };
+  const BUILTINS = {
+    exp: [1, Math.exp], log: [1, (x) => { if (x <= 0) throw new Error('math domain error'); return Math.log(x); }],
+    sqrt: [1, (x) => { if (x < 0) throw new Error('math domain error'); return Math.sqrt(x); }],
+    abs: [1, Math.abs], tanh: [1, Math.tanh], pow: [2, (a, b) => dom(Math.pow(a, b))],
+    min: [-1, (...a) => Math.min(...a)], max: [-1, (...a) => Math.max(...a)],
+    pos: [1, (x) => Math.max(0, x)], neg: [1, (x) => Math.min(0, x)], ageU: [1, (x) => -Math.abs(x)],
+    cube: [1, (x) => x * x * x], sq: [1, (x) => x * Math.abs(x)],
+    sat: [1, (x) => Math.tanh(2 * x) / Math.tanh(2)], sig: [1, (x) => 1 / (1 + Math.exp(-x))],
+    clamp: [3, (x, a, b) => Math.max(a, Math.min(b, x))],
+  };
+
+  class Evaluator {
+    constructor(funcs) { this.funcs = funcs; }
+    eval(e, scope, origin, depth) {
+      origin = origin || '<model>';
+      depth = depth || 0;
+      if (depth > 60) throw new ModelError('function call nesting too deep', null, origin);
+      const k = e[0];
+      const ev = (x) => this.eval(x, scope, origin, depth);
+      switch (k) {
+        case 'num': return e[1];
+        case 'var':
+          if (!(e[1] in scope)) throw new ModelError('unknown name ' + pyrepr(e[1]), e[2], origin);
+          return scope[e[1]];
+        case 'neg': return -ev(e[1]);
+        case 'if': return ev(ev(e[1]) ? e[2] : e[3]);
+        case 'or': return (ev(e[1]) || ev(e[2])) ? 1 : 0;
+        case 'and': return (ev(e[1]) && ev(e[2])) ? 1 : 0;
+        case 'not': return ev(e[1]) ? 0 : 1;
+        case 'cmp': {
+          const a = ev(e[2]), b = ev(e[3]);
+          const r = { '<': a < b, '>': a > b, '<=': a <= b, '>=': a >= b, '==': a === b, '!=': a !== b }[e[1]];
+          return r ? 1 : 0;
+        }
+        case 'bin': {
+          const a = ev(e[2]), b = ev(e[3]);
+          if (e[1] === '+') return a + b;
+          if (e[1] === '-') return a - b;
+          if (e[1] === '*') return a * b;
+          if (b === 0) throw new ModelError('division by zero', e[4], origin);
+          return a / b;
+        }
+        default: break;
+      }
+      const name = e[1], ln = e[3];
+      const args = e[2].map(ev);
+      if (Object.prototype.hasOwnProperty.call(this.funcs, name)) {
+        const f = this.funcs[name];
+        if (args.length > f.params.length) throw new ModelError(name + ' takes at most ' + f.params.length + ' arguments', ln, origin);
+        const local = Object.create(scope);
+        f.params.forEach(([pn, def], i) => {
+          if (i < args.length) local[pn] = args[i];
+          else if (def !== null) local[pn] = this.eval(def, local, f.origin, depth + 1);
+          else throw new ModelError(name + ' is missing argument ' + pyrepr(pn), ln, origin);
+        });
+        return this.eval(f.body, local, f.origin, depth + 1);
+      }
+      if (Object.prototype.hasOwnProperty.call(BUILTINS, name)) {
+        const [arity, fn] = BUILTINS[name];
+        if (arity >= 0 && args.length !== arity) throw new ModelError(name + '(): wrong number of arguments', ln, origin);
+        try {
+          const r = fn(...args);
+          if (!Number.isFinite(r) && args.every(Number.isFinite)) throw new Error('math range error');
+          return r;
+        } catch (exc) {
+          throw new ModelError(name + '(): ' + exc.message, ln, origin);
+        }
+      }
+      throw new ModelError('unknown function ' + pyrepr(name), ln, origin);
+    }
+    apply(op, cur, v, line, origin) {
+      if (op === '=') return v;
+      if (op === '+=') return cur + v;
+      if (op === '-=') return cur - v;
+      if (op === '*=') return cur * v;
+      if (v === 0) throw new ModelError('division by zero', line, origin);
+      return cur / v;
+    }
+  }
+
+  const dict = () => Object.create(null);
+
+  class Model {
+    constructor() {
+      this.params = dict(); this.meta = dict(); this.funcs = dict(); this.traits = dict();
+      this.resolve = []; this.readout = dict();
+      this.ev = new Evaluator(this.funcs);
+    }
+    add(text, origin) {
+      const prog = parse(text, origin);
+      for (const d of prog.defs) this.funcs[d.name] = d;
+      for (const p of prog.params) {
+        this.params[p.name] = this.ev.eval(p.expr, Object.create(this.params), p.origin);
+        this.meta[p.name] = p.meta;
+      }
+      for (const t of prog.traits) this.traits[t.name] = t;
+      this.resolve.push(...prog.resolve);
+      for (const st of prog.readout) {
+        if (st.op !== '=') throw new ModelError('readout statements must use =', st.line, st.origin);
+        this.readout[st.name] = st;
+      }
+      return this;
+    }
+    validate() {
+      const lists = Object.values(this.traits).map((t) => t.stmts).concat([this.resolve]);
+      for (const stmts of lists) {
+        for (const st of stmts) {
+          if (!(st.name in this.params)) throw new ModelError('unknown parameter ' + pyrepr(st.name), st.line, st.origin);
+        }
+      }
+      return this;
+    }
+    traitInfo() {
+      const out = {};
+      for (const [n, t] of Object.entries(this.traits)) {
+        out[n] = { label: t.meta.label !== undefined ? t.meta.label : n, group: t.meta.group || '', help: t.meta.help || '' };
+      }
+      return out;
+    }
+    defaultPersona() {
+      const out = {};
+      for (const n of Object.keys(this.traits)) out[n] = 0;
+      return out;
+    }
+    normalizePersona(persona) {
+      const out = this.defaultPersona();
+      for (const [k, v] of Object.entries(persona || {})) {
+        if (k in out) {
+          const x = Number(v);
+          if (!Number.isNaN(x)) out[k] = Math.max(-1, Math.min(1, x));
+        }
+      }
+      return out;
+    }
+    effectiveParams(base, persona) {
+      const E = Object.assign(dict(), this.params, base || {});
+      const per = this.normalizePersona(persona);
+      for (const [name, t] of Object.entries(this.traits)) {
+        const value = per[name];
+        if (!value) continue;
+        const scope = Object.create(E);
+        scope.value = value;
+        for (const st of t.stmts) E[st.name] = this.ev.apply(st.op, E[st.name], this.ev.eval(st.expr, scope, st.origin), st.line, st.origin);
+      }
+      for (const [k, m] of Object.entries(this.meta)) {
+        if ('min' in m) E[k] = Math.max(m.min, E[k]);
+        if ('max' in m) E[k] = Math.min(m.max, E[k]);
+      }
+      for (const st of this.resolve) E[st.name] = this.ev.apply(st.op, E[st.name], this.ev.eval(st.expr, E, st.origin), st.line, st.origin);
+      return E;
+    }
+    evaluateReadout(inputs, params) {
+      const base = Object.assign(Object.create(params), inputs);
+      const out = Object.create(base);
+      for (const st of Object.values(this.readout)) out[st.name] = this.ev.eval(st.expr, out, st.origin);
+      const res = {};
+      for (const k of Object.keys(out)) if (!k.startsWith('_')) res[k] = out[k];
+      return res;
+    }
+    paramTable() {
+      return Object.entries(this.params).map(([k, v]) => {
+        const m = this.meta[k];
+        return {
+          key: k, label: m.label !== undefined ? m.label : k.replace(/_/g, ' '), group: m.group || 'Other', default: v,
+          step: m.step !== undefined ? m.step : null, min: m.min !== undefined ? m.min : null,
+          max: m.max !== undefined ? m.max : null, visible: m.visible !== undefined ? m.visible : true,
+        };
+      });
+    }
+  }
+
+  /* files: array of [origin, text] in load order: bundled files first, then the optional user model. */
+  function loadFromTexts(files) {
+    const m = new Model();
+    for (const [origin, text] of files) m.add(text, origin);
+    return m.validate();
+  }
+
+  return { Model, ModelError, parse, tokenize, loadFromTexts, BUILTINS };
+});
+const MODEL=MindModel.loadFromTexts([
+ ["params.mind", `# Parameters: \`param name = value | label=... step=... min=... max=... visible=false\`.
+# \`group "Name"\` sets the UI group for the params below it. min/max clamp the effective value after traits ran.
+
+group "Cross-timescale coupling"
+param speed_fast = 1 | label="FAST layer speed x" step=0.1
+param speed_mid = 1 | label="MID layer speed x" step=0.1
+param speed_slow = 1 | label="SLOW layer speed x" step=0.1
+param carry_valence_to_mood = 0.4 | label="fast valence -> mood carry" step=0.05 min=0
+param carry_phasic_to_arousal = 0.08 | label="fast arousal burst -> arousal carry" min=0
+param carry_standards_to_selfesteem = 0.15 | label="standards impulse -> self esteem carry" step=0.05 min=0
+param slow_follow_mood = 0.35 | label="mood baseline follows 24h mood" step=0.05 min=0
+param slow_follow_arousal = 0.25 | label="arousal baseline follows 24h arousal" step=0.05 min=0
+param mood_avg_hl = 1440 | label="24h average half-life (min)" step=60
+
+group "Half-lives (min)"
+param hl_phasic = 4 | label="phasic arousal" step=0.5
+param hl_valence_reaction = 8 | label="valence reaction" step=0.5
+param hl_threat = 10 | label="threat trace" step=0.5
+param hl_surprise = 20 | label="surprise trace" step=1
+param hl_adversity = 20 | label="adversity trace" step=1
+param hl_recent_success = 30 | label="recent success" step=1
+param hl_arousal_tonic = 60 | label="arousal (tonic)" step=5
+param hl_mood = 360 | label="mood" step=10
+param hl_dominance = 180 | label="dominance" step=10
+param hl_standards = 720 | label="standards met" step=30
+param hl_seeking = 90 | label="seeking" step=5
+param hl_play = 120 | label="play" step=5
+param hl_wanting = 45 | label="lust wanting" step=5
+param hl_inhibition = 120 | label="lust inhibition" step=5
+param hl_missing = 180 | label="missing user" step=10
+param hl_commit = 15 | label="task commitment" step=1
+param tau_boredom = 130 | label="boredom time constant" step=5
+param hl_bond = 14400 | label="bond" step=500
+param hl_competence = 2880 | label="competence" step=100
+param hl_self_esteem = 20160 | label="self esteem" step=500
+param hl_arousal_baseline = 2160 | label="arousal baseline" step=100
+param hl_mood_baseline = 4320 | label="mood baseline" step=100
+
+group "Impulse sizes"
+param imp_phasic_novelty = 0.5 | label="arousal <- novelty" min=0
+param imp_phasic_threat = 0.9 | label="arousal <- threat"
+param imp_phasic_erotic = 0.4 | label="arousal <- erotic cue" min=0
+param imp_phasic_goal = 0.2 | label="arousal <- |goal|"
+param imp_phasic_anticipation = 0.3 | label="arousal <- anticipation"
+param imp_val_goal = 0.15 | label="valence <- goal"
+param imp_val_warm = 0.1 | label="valence <- warmth" min=0
+param imp_val_standards = 0.1 | label="valence <- standards" min=0
+param reunion_relief = 0.6 | label="valence <- reunion"
+param impulse_cap = 0.8 | label="cap per step (latent)"
+param impulse_budget = 1.5 | label="budget per hour (latent)" step=0.1
+param appraisal_saturation = 3 | label="per-step saturation" step=0.1
+param surprise_gain = 0.3 | label="surprise per novelty/failure" step=0.05
+
+group "Conditioning"
+param habituation_strength = 0.15 | label="habituation strength"
+param habituation_half_life = 30 | label="habituation half-life" step=1
+param mood_congruence = 0.3 | label="mood congruence"
+param hormone_congruence = 0.2 | label="hormone congruence"
+param missing_warmth_boost = 0.5 | label="warmth boost when missing" min=0
+param intensity_bond = 1 | label="intense warmth bonds more" min=0
+
+group "Freeform impulses"
+param freeform_reference = 5 | label="reference (delta covering 76%)" step=0.5
+param hammer_scale = 1 | label="hammer scale" step=0.1
+param hammer_half_life = 30 | label="hammer recovery (min)" step=1
+
+group "Gates and blunting"
+param gate_floor_phasic = 0.1 | label="phasic gate floor"
+param phasic_scale = 3 | label="phasic scale" step=0.1
+param blunting = 1.2 | label="sleep-debt blunting" step=0.1
+param rumination = 0.5 | label="rumination"
+param giveup = 0.5 | label="give-up rate"
+
+group "Controller master"
+param ctl_on = 1 | label="controller on (1/0)" step=1
+param demand_gain = 1.6 | label="task demand -> arousal" step=0.1
+
+group "Controller: arousal"
+param ctl_arousal_comfort = 0.6 | label="comfort level"
+param ctl_arousal_drain = 0.4 | label="reserve drain / h"
+param ctl_arousal_rec = 300 | label="recovery half-life (min)" step=10
+param ctl_arousal_rebound = 2.5 | label="rebound depth" step=0.1
+param ctl_arousal_shield = 0.8 | label="task shield" step=0.05
+param ctl_arousal_deriv = 6 | label="derivative damping" step=0.5
+
+group "Controller: seeking"
+param ctl_seeking_comfort = 0.4 | label="comfort level"
+param ctl_seeking_drain = 0.5 | label="reserve drain / h"
+param ctl_seeking_rec = 240 | label="recovery half-life (min)" step=10
+param ctl_seeking_rebound = 1.2 | label="rebound depth" step=0.1
+param ctl_seeking_shield = 0.4 | label="task shield" step=0.05
+param ctl_seeking_deriv = 3 | label="derivative damping" step=0.5
+
+group "Controller: play"
+param ctl_play_comfort = 0.3 | label="comfort level"
+param ctl_play_drain = 0.5 | label="reserve drain / h"
+param ctl_play_rec = 240 | label="recovery half-life (min)" step=10
+param ctl_play_rebound = 1 | label="rebound depth" step=0.1
+param ctl_play_shield = 0 | label="task shield" step=0.05
+param ctl_play_deriv = 2 | label="derivative damping" step=0.5
+
+group "Controller: lust_wanting"
+param ctl_lust_wanting_comfort = 0.3 | label="comfort level"
+param ctl_lust_wanting_drain = 0.8 | label="reserve drain / h"
+param ctl_lust_wanting_rec = 180 | label="recovery half-life (min)" step=10
+param ctl_lust_wanting_rebound = 1.2 | label="rebound depth" step=0.1
+param ctl_lust_wanting_shield = 0 | label="task shield" step=0.05
+param ctl_lust_wanting_deriv = 2 | label="derivative damping" step=0.5
+
+group "Controller: dominance"
+param ctl_dominance_comfort = 0.55 | label="comfort level"
+param ctl_dominance_drain = 0.3 | label="reserve drain / h"
+param ctl_dominance_rec = 360 | label="recovery half-life (min)" step=10
+param ctl_dominance_rebound = 1 | label="rebound depth" step=0.1
+param ctl_dominance_shield = 0.6 | label="task shield" step=0.05
+param ctl_dominance_deriv = 2 | label="derivative damping" step=0.5
+
+group "Strain and spillover"
+param strain_threshold = 0.75 | label="arousal strain threshold"
+param strain_gain = 1.5 | label="arousal strain gain" step=0.1
+param strain_hl = 720 | label="arousal strain half-life" step=30
+param strain_to_baseline = 0.35 | label="strain -> arousal baseline"
+param mood_strain_threshold = 0.4 | label="low-mood strain threshold"
+param mood_strain_gain = 1 | label="low-mood strain gain" step=0.1
+param mood_strain_to_baseline = 0.6 | label="strain -> mood baseline"
+param spill_arousal = 0.15 | label="spill phasic -> arousal baseline"
+param spill_mood = 0.1 | label="spill reaction -> mood baseline"
+param spill_debt = 0.002 | label="spill wake -> sleep debt" step=0.001
+param spill_daily_cap = 0.6 | label="spill daily cap (latent)" step=0.05
+
+group "Drives and targets"
+param boredom_rate = 0.8 | label="boredom build rate" min=0
+param reunion_keep = 0.4 | label="missing kept after reunion"
+param missing_ramp = 2 | label="missing ramp" step=0.1 min=0
+param detach_start = 4320 | label="detachment starts (min)" step=60
+param detach_tau = 2880 | label="detachment time constant" step=60
+param bond_baseline = 0.45 | label="bond baseline"
+param circ_arousal = 0.7 | label="circadian -> arousal" step=0.05
+param sleep_pressure_arousal = 1.4 | label="sleep pressure -> arousal" step=0.05
+param ultradian_amp = 0.08 | label="ultradian amplitude"
+param weather_mood = 0.15 | label="weather -> mood"
+param mood_baseline_offset = 0.25 | label="mood baseline offset"
+param bistable = 0 | label="mood bistability" min=0
+param wanting_deprivation = 0.3 | label="wanting <- time since warmth" step=0.05
+param deprivation_scale = 2880 | label="deprivation time scale (min)" step=60
+
+group "Body and clock"
+param tau_wake = 1092 | label="wake time constant (min)" step=30
+param tau_sleep = 252 | label="sleep time constant (min)" step=10
+param load_fatigue = 0.0015 | label="load -> fatigue" step=0.0005
+param stress_fatigue = 0.0008 | label="stress -> fatigue" step=0.0005
+param light_fatigue = 0.3 | label="dark -> fatigue"
+param moon_sleep = 0.3 | label="moon -> sleep"
+param clock_anchor = 15 | label="clock anchor (h)" step=0.5
+param clock_period = 24 | label="clock period (h)" step=0.1
+param phase_gain = 0.0015 | label="phase shift gain" step=0.0005
+param anchor_pull = 0.01 | label="anchor pull" step=0.005
+param sleep_threshold = -0.3 | label="sleep threshold" step=0.05
+param sleep_standards_boost = 1 | label="sleep heals standards" step=1
+
+group "Environment"
+param lat = 48.2 | label="latitude" step=0.5
+param start_doy = 278 | label="start day of year" step=1
+param cloud = 0.4 | label="cloud cover" step=0.05
+param pressure = 1013 | label="pressure (hPa)" step=1
+param weather_swing = 0 | label="pressure swing (hPa)" step=1
+param moon_on = 1 | label="moon effect" step=0.1
+param moon_phase0 = 5 | label="lunar age at start (d)" step=0.5
+
+group "Persona (cycle timing)"
+param cycle_alpha = 0 | label="cycle strength (0 = off; set by trait Menstrual cycle)" step=0.1 min=0
+param cycle_length = 28 | label="cycle length (days)" step=1
+param cycle_start_day = 3 | label="cycle day at start" step=1
+
+group "Trait hooks (advanced)"
+param tb_arousal = 0 | label="arousal target bias (logit)" step=0.1
+param tb_mood = 0 | label="mood target bias" step=0.1
+param tb_dom = 0 | label="dominance target bias (logit)" step=0.1
+param tb_seek = 0 | label="seeking target bias (logit)" step=0.1
+param tb_play = 0 | label="play target bias (logit)" step=0.1
+param tb_want = 0 | label="wanting target bias (logit)" step=0.1
+param tb_inh = 0 | label="inhibition target bias (logit)" step=0.1
+param tb_bond = 0 | label="bond target bias (logit)" step=0.1
+param tb_comp = 0 | label="competence target bias (logit)" step=0.1
+param tb_self = 0 | label="self esteem target bias (logit)" step=0.1
+param imp_gain = 1 | label="all appraisal impulses x" step=0.1
+param lust_mul = 1 | label="LUST gate x" step=0.1
+param cyc_amp = 0 | label="spontaneous mood cycle amplitude" step=0.05 min=0
+param cyc_days = 6 | label="spontaneous cycle period (days)" step=0.5
+param floor_bond = 0 | label="FLOOR bond (0 = off)" step=0.05
+param floor_comp = 0 | label="FLOOR competence (0 = off)" step=0.05
+param floor_self = 0 | label="FLOOR self esteem (0 = off)" step=0.05
+param floor_dom = 0 | label="FLOOR dominance (0 = off)" step=0.05
+param floor_mood = 0 | label="FLOOR mood and baseline (0 = off)" step=0.05
+param cap_inh = 1 | label="CAP lust inhibition (1 = off)" step=0.05 min=0.03
+
+group "Top-level"
+param lust_gate = 1 | label="LUST impulse gate (0-1)" step=0.1
+`],
+ ["traits.mind", `# Traits: functions over parameters. \`value\` is the trait setting in [-1, 1]; zero-valued traits are skipped.
+# Statements may use = += -= *= /= on parameters; applied in file order, then param min/max clamps, then resolve.
+
+trait energy | label="Energy" group="Temperament" help="Sluggish to high-voltage." {
+  tb_arousal += 0.9 * value
+  tb_seek += 0.4 * value
+  tb_play += 0.3 * value
+  tau_wake *= exp(0.3 * value)
+  speed_mid *= exp(0.15 * value)
+}
+trait extraversion | label="Extraversion" group="Temperament" help="Outward activation, seeking and play." {
+  tb_arousal += 0.35 * value
+  tb_seek += 0.35 * value
+  tb_play += 0.3 * value
+  hl_missing *= exp(-0.3 * value)
+}
+trait playful | label="Playful" group="Temperament" help="Higher, lingering PLAY drive." {
+  tb_play += value
+  tb_mood += 0.15 * value
+  hl_play *= exp(0.3 * value)
+}
+trait mischievous | label="Mischievous" group="Temperament" help="Teasing, boundary-testing." {
+  tb_play += 0.6 * value
+  tb_dom += 0.4 * value
+  tb_seek += 0.3 * value
+  imp_gain *= exp(0.15 * value)
+  giveup *= exp(0.4 * value)
+}
+trait curiosity | label="Curiosity" group="Temperament" help="Higher SEEKING, stronger novelty." {
+  tb_seek += value
+  imp_phasic_novelty += 0.3 * value
+  boredom_rate += 0.3 * value
+}
+trait creativity | label="Creativity" group="Temperament" help="Exploration and play, surprise less jarring." {
+  tb_seek += 0.4 * value
+  tb_play += 0.4 * value
+  imp_phasic_novelty += 0.2 * value
+  surprise_gain *= exp(-0.25 * value)
+}
+trait conscientiousness | label="Conscientiousness" group="Temperament" help="Persistence and standards." {
+  tb_dom += 0.3 * value
+  tb_inh += 0.2 * value
+  giveup *= exp(-0.7 * value)
+  hl_commit *= exp(0.5 * value)
+  hl_standards *= exp(0.3 * value)
+}
+trait rebelliousness | label="Rebelliousness" group="Temperament" help="Resists structure and demands." {
+  tb_dom += 0.5 * value
+  tb_inh += -0.2 * value
+  hl_commit *= exp(-0.5 * value)
+  giveup *= exp(0.4 * value)
+  demand_gain *= exp(-0.5 * value)
+}
+trait patience | label="Patience" group="Temperament" help="Short fuse to patient." {
+  giveup *= exp(-value)
+  rumination *= exp(-0.5 * value)
+  hl_adversity *= exp(-0.5 * value)
+  hl_commit *= exp(0.3 * value)
+}
+trait impulsivity | label="Impulsivity" group="Temperament" help="Stronger, faster reactions, weaker brakes." {
+  imp_gain *= exp(0.5 * value)
+  speed_fast *= exp(0.5 * value)
+  impulse_budget *= exp(0.5 * value)
+  tb_inh += -0.4 * value
+  hl_phasic *= exp(0.2 * value)
+}
+trait warmth | label="Warmth" group="Social and affect" help="Closer bond, warmer mood." {
+  tb_bond += 0.5 * value
+  tb_mood += 0.25 * value
+  tb_want += 0.15 * value
+  missing_warmth_boost += 0.3 * value
+}
+trait tenderness | label="Tenderness" group="Social and affect" help="Soft, affiliative." {
+  tb_bond += 0.3 * value
+  tb_mood += 0.15 * value
+  tb_dom += -0.1 * value
+  imp_val_warm += 0.08 * value
+}
+trait sociability | label="Sociability" group="Social and affect" help="Misses the user sooner." {
+  hl_missing *= exp(-0.35 * value)
+  tb_seek += 0.2 * value
+  tb_bond += 0.2 * value
+  missing_ramp += 0.6 * value
+}
+trait assertiveness | label="Assertiveness" group="Social and affect" help="Submissive to assertive." {
+  tb_dom += value
+  tb_inh += -0.2 * value
+}
+trait formality | label="Formality" group="Social and affect" help="Restrained, less play." {
+  tb_play += -0.5 * value
+  tb_inh += 0.3 * value
+  tb_dom += 0.2 * value
+  imp_gain *= exp(-0.3 * value)
+}
+trait optimism | label="Optimism" group="Mood and resilience" help="Pessimistic to optimistic." {
+  tb_mood += 0.4 * value
+  mood_baseline_offset += 0.25 * value
+  rumination *= exp(-0.4 * value)
+}
+trait depressive_manic | label="Depressive / manic" group="Mood and resilience" help="Negative: depressive, slow. Positive: manic, restless, bistable highs." {
+  tb_mood += value
+  tb_arousal += 0.8 * value
+  tb_dom += 0.5 * value
+  tb_seek += 0.5 * value
+  tb_play += 0.3 * value
+  tb_want += 0.3 * value
+  tau_wake *= exp(0.5 * value)
+  mood_baseline_offset += 0.4 * value
+  bistable += 0.15 * value
+  speed_mid *= exp(0.25 * value)
+  rumination *= exp(-0.6 * value)
+}
+trait mood_cycling | label="Mood cycling" group="Mood and resilience" help="Spontaneous slow mood swings." {
+  cyc_amp += 0.9 * pos(value)
+}
+trait menstrual_cycle | label="Menstrual cycle" group="Mood and resilience" help="Optional hormone cycle strength." {
+  cycle_alpha += pos(value)
+  hormone_congruence *= exp(0.2 * pos(value))
+}
+trait resilience | label="Resilience" group="Mood and resilience" help="Brittle to resilient." {
+  mood_strain_gain *= exp(-0.8 * value)
+  strain_gain *= exp(-0.6 * value)
+  hl_adversity *= exp(-0.4 * value)
+  tb_self += 0.3 * value
+}
+trait sensitivity | label="Sensitivity" group="Mood and resilience" help="Reacts more to everything." {
+  imp_gain *= exp(0.5 * value)
+  mood_congruence *= exp(0.5 * value)
+  hormone_congruence *= exp(0.4 * value)
+  surprise_gain *= exp(0.3 * value)
+  habituation_strength *= exp(-0.3 * value)
+}
+trait shame_proneness | label="Shame-proneness" group="Mood and resilience" help="Failures sink deeper and linger." {
+  imp_val_standards += 0.15 * value
+  hl_standards *= exp(0.6 * value)
+  carry_standards_to_selfesteem += 0.2 * value
+  tb_self += -0.3 * value
+  tb_mood += -0.1 * value
+}
+trait emotional_stability | label="Emotional stability" group="Dynamics (timescales)" help="Volatile to steady." {
+  speed_fast *= exp(-0.4 * value)
+  imp_gain *= exp(-0.5 * value)
+  surprise_gain *= exp(-0.5 * value)
+  rumination *= exp(-0.7 * value)
+  tb_dom += 0.4 * value
+  tb_mood += 0.2 * value
+  mood_strain_gain *= exp(-0.5 * value)
+}
+trait moody | label="Moody" group="Dynamics (timescales)" help="Quick, large mood swings that stick." {
+  speed_fast *= exp(0.6 * value)
+  speed_mid *= exp(0.6 * value)
+  speed_slow *= exp(-0.3 * value)
+  carry_valence_to_mood += 0.3 * value
+  carry_phasic_to_arousal += 0.06 * value
+  imp_gain *= exp(0.4 * value)
+  mood_congruence *= exp(0.4 * value)
+  cyc_amp += 0.15 * value
+}
+trait dynamicity | label="Dynamicity" group="Dynamics (timescales)" help="Flat/stoic to lively." {
+  speed_fast *= exp(0.5 * value)
+  speed_mid *= exp(0.4 * value)
+  speed_slow *= exp(0.3 * value)
+  imp_gain *= exp(0.6 * value)
+  carry_valence_to_mood += 0.2 * value
+  carry_phasic_to_arousal += 0.04 * value
+  impulse_cap *= exp(0.3 * value)
+}
+trait horizon | label="Horizon: reactive vs long-term" group="Dynamics (timescales)" help="Reactive forgets quickly; accumulating writes reactions into slow baselines." {
+  speed_fast *= exp(-0.5 * value)
+  speed_slow *= exp(0.8 * value)
+  carry_valence_to_mood += 0.3 * value
+  slow_follow_mood += 0.25 * value
+  slow_follow_arousal += 0.2 * value
+  spill_arousal *= exp(0.5 * value)
+  spill_mood *= exp(0.5 * value)
+}
+trait autistic | label="Autistic-style processing" group="Cognition" help="Coarse behavioural knobs, not a diagnosis model." {
+  surprise_gain *= exp(0.4 * pos(value))
+  hl_surprise *= exp(0.7 * pos(value))
+  habituation_strength *= exp(-0.5 * pos(value))
+  hl_commit *= exp(0.6 * pos(value))
+  giveup *= exp(-0.4 * pos(value))
+  tb_play += -0.3 * pos(value)
+  tb_inh += 0.2 * pos(value)
+  imp_phasic_novelty += 0.2 * pos(value)
+}
+trait romanticism | label="Romanticism" group="Intimacy" help="Deeper, slower-fading bond." {
+  tb_bond += 0.6 * value
+  hl_bond *= exp(0.4 * value)
+  intensity_bond += 0.6 * value
+  tb_want += 0.2 * value
+  hl_missing *= exp(0.3 * value)
+}
+trait sensuality | label="Sensuality" group="Intimacy" help="Wanting higher, erotic cues arouse more." {
+  tb_want += 0.6 * value
+  tb_inh += -0.2 * value
+  imp_phasic_erotic += 0.3 * value
+}
+trait naughty | label="Naughty" group="Intimacy" help="Provocative when allowed." {
+  tb_want += 0.7 * value
+  tb_inh += -0.6 * value
+  lust_mul *= exp(0.3 * value)
+  tb_play += 0.2 * value
+}
+trait prudishness | label="Prudishness" group="Intimacy" help="Strong brake on erotic expression." {
+  tb_inh += 0.9 * pos(value)
+  tb_want += -0.3 * pos(value)
+  lust_mul *= exp(-0.8 * pos(value))
+}
+trait age | label="Age / maturity" group="Intimacy" help="-1 young, 0 mid-life, +1 old; U-shaped inhibition." {
+  tb_inh += 0.9 * ageU(value)
+  tb_seek += -0.4 * value
+  tb_play += -0.4 * value
+  tb_dom += 0.4 * value
+  mood_baseline_offset += 0.15 * value
+  tau_wake *= exp(-0.2 * value)
+}
+trait enforced_loyalty | label="OVERRIDE: enforced loyalty" group="Overrides" help="Forces bond to the top of its range." {
+  floor_bond = max(floor_bond, pos(value))
+  tb_bond += 1.5 * pos(value)
+  hl_missing *= exp(0.3 * pos(value))
+}
+trait bond_floor | label="OVERRIDE: bond floor" group="Overrides" help="Bond never drops below this." {
+  floor_bond = max(floor_bond, pos(value))
+}
+trait competence_floor | label="OVERRIDE: competence floor" group="Overrides" help="Competence floor." {
+  floor_comp = max(floor_comp, pos(value))
+}
+trait selfesteem_floor | label="OVERRIDE: self-esteem floor" group="Overrides" help="Self esteem floor." {
+  floor_self = max(floor_self, pos(value))
+}
+trait dominance_floor | label="OVERRIDE: dominance floor" group="Overrides" help="Dominance floor." {
+  floor_dom = max(floor_dom, pos(value))
+}
+trait contentment_lock | label="OVERRIDE: mood floor" group="Overrides" help="Mood and baseline floor." {
+  floor_mood = max(floor_mood, pos(value))
+}
+trait uninhibited | label="OVERRIDE: inhibition cap" group="Overrides" help="Caps LUST inhibition." {
+  cap_inh = min(cap_inh, 1 + -0.95 * pos(value))
+}
+`],
+ ["resolve.mind", `# Derived parameters, evaluated after traits and clamps.
+resolve {
+  lust_gate *= lust_mul
+}
+`],
+ ["readout.mind", `# Readouts: derived values computed from the mind state after every step. Names starting with _ are temporaries.
+# Inputs: all latent values, arousal, mood, stress, cert, threat_trace, adversity_trace, present, circ, light, ... and all parameters.
+readout {
+  mood = mood
+  arousal = arousal
+  dominance = dominance
+  certainty = cert
+  stress = stress
+  standards_met = standards_met
+  task_commitment = task_commitment
+  seeking = seeking
+  play = play
+  lust_wanting = lust_wanting
+  lust_inhibition = lust_inhibition
+  desire = lust_wanting * (1 - lust_inhibition) * (0.4 + 0.6 * arousal)
+  _hill = pow(desire, 3) / (pow(desire, 3) + pow(0.25, 3))
+  desire_expressed = _hill * (0.2 + 0.8 * present)
+  boredom = boredom
+  missing_user = missing_user
+  bond = bond
+  competence = competence
+  self_esteem = self_esteem
+  sleep_pressure = sleep_pressure
+  sleep_debt = sleep_debt
+  arousal_baseline = arousal_baseline
+  mood_baseline = mood_baseline
+  anxiety = min(1, (0.7 * pos(0.5 - dominance) + 0.7 * pos(0.5 - cert) + 0.3 * pos(-mood)) * min(1, 1.6 * arousal))
+  fear = anxiety * min(1, 3 * threat_trace)
+  determination = task_commitment * (1 - sleep_pressure) * min(1, 0.3 + 3 * adversity_trace)
+  frustration = task_commitment * min(1, 3 * adversity_trace) * dominance
+  exploration = seeking * dominance * (1 - stress) * (1 - sleep_pressure) * (1 - 0.6 * task_commitment)
+  tension = arousal * pos(-mood)
+  excitement = arousal * pos(mood)
+  calm = (1 - arousal) * pos(mood)
+  lethargy = (1 - arousal) * pos(-mood)
+  efficiency = exp(-pow(arousal - 0.55, 2) / (2 * 0.04)) * (1 - 0.5 * sleep_pressure)
+  res_arousal = res_arousal
+  res_seeking = res_seeking
+  res_play = res_play
+  res_wanting = res_wanting
+  res_dominance = res_dominance
+  strain_arousal = aStrain
+  strain_mood = mStrain
+  circadian = (circ + 1) / 2
+  light = light
+  cycle_estrogen = H_E
+  cycle_progesterone = H_P
+  moon = moon
+  present = present
+  clock_phase = clock_phase
+}
+`]
+]);
+const PARAM_DEFS=MODEL.paramTable().map(r=>[r.key,r.label,r.default,r.step||0.01,r.group]);
 function defaultParams(){const P={};for(const r of PARAM_DEFS)P[r[0]]=r[2];return P;}
+const TRAITS=MODEL.traitInfo();
+const PERSONA_KEYS=Object.keys(TRAITS);
+function defaultPersona(){return MODEL.defaultPersona();}
+// lust_gate is set from cfg.lustGate * lust_mul inside simulate(), so the UI keeps the base value here
+function effectiveParams(P,persona){const E=Object.assign({},MODEL.effectiveParams(P,persona));E.lust_gate=P.lust_gate;return E;}
+//MINDMODEL_END
 function ctlP(P,v){return {comfort:P['ctl_'+v+'_comfort'],drain:P['ctl_'+v+'_drain'],rec:P['ctl_'+v+'_rec'],rebound:P['ctl_'+v+'_rebound'],shield:P['ctl_'+v+'_shield'],deriv:P['ctl_'+v+'_deriv']};}
 const G=(x,m,sd,T)=>{const d=(((x-m+T/2)%T)+T)%T-T/2;return Math.exp(-d*d/(2*sd*sd));};
 class Env{
@@ -227,71 +1117,6 @@ function simulate(cfg,P,REC=5){
   return {series,N,REC,W:I.W,sess:I.sess,names:I.names,pres:I.pres,away,ms:Date.now()-t0,impMin};
 }
 
-//TRAITS_START
-const MUL_KEYS=new Set(['speed_fast','speed_mid','speed_slow','imp_gain','lust_mul','surprise_gain','rumination','giveup','strain_gain','mood_strain_gain','tau_wake','blunting','habituation_strength','mood_congruence','hormone_congruence','demand_gain','impulse_budget','impulse_cap','spill_arousal','spill_mood','hl_phasic','hl_surprise','hl_adversity','hl_commit','hl_standards','hl_bond','hl_missing','hl_play','hl_mood','hl_mood_baseline','hl_competence','hl_self_esteem']);
-const FLOOR_KEYS=new Set(['floor_bond','floor_comp','floor_self','floor_dom','floor_mood']);
-const SIGNED_ADD=new Set(['tb_arousal','tb_mood','tb_dom','tb_seek','tb_play','tb_want','tb_inh','tb_bond','tb_comp','tb_self','mood_baseline_offset']);
-const CURVES={lin:x=>x,abs:x=>Math.abs(x),ageU:x=>-Math.abs(x),pos:x=>Math.max(0,x),neg:x=>Math.min(0,x),cube:x=>x*x*x,sq:x=>x*Math.abs(x),sat:x=>Math.tanh(2*x)/Math.tanh(2)};
-const T=(label,group,help,fx,curve)=>({label,group,help,fx,curve:curve||'lin'});
-const TRAITS={
- energy:T('Energy','Temperament','- = sluggish, + = high-voltage. Raises arousal target, drives and fatigue resistance.',[['tb_arousal',.9],['tb_seek',.4],['tb_play',.3],['tau_wake',.3],['speed_mid',.15]]),
- extraversion:T('Extraversion','Temperament','- = introverted, + = extraverted. Outward activation, seeking and play.',[['tb_arousal',.35],['tb_seek',.35],['tb_play',.3],['hl_missing',-.3]]),
- playful:T('Playful','Temperament','Appetite for humour and banter; the PLAY drive sits higher and lingers.',[['tb_play',1],['tb_mood',.15],['hl_play',.3]]),
- mischievous:T('Mischievous','Temperament','Teasing, provocative, boundary-testing: play, initiative, slightly weaker commitment.',[['tb_play',.6],['tb_dom',.4],['tb_seek',.3],['imp_gain',.15],['giveup',.4]]),
- curiosity:T('Curiosity','Temperament','SEEKING sits higher, novelty hits harder, boredom builds faster.',[['tb_seek',1],['imp_phasic_novelty',.3],['boredom_rate',.3]]),
- creativity:T('Creativity','Temperament','Exploration and play with a taste for the unexpected (surprise is less jarring).',[['tb_seek',.4],['tb_play',.4],['imp_phasic_novelty',.2],['surprise_gain',-.25]]),
- conscientiousness:T('Conscientiousness','Temperament','Persistence and standards: slower give-up, task commitment holds, standards linger.',[['tb_dom',.3],['tb_inh',.2],['giveup',-.7],['hl_commit',.5],['hl_standards',.3]]),
- rebelliousness:T('Rebelliousness','Temperament','Resists structure and demands: higher dominance, commitment gives way faster.',[['tb_dom',.5],['tb_inh',-.2],['hl_commit',-.5],['giveup',.4],['demand_gain',-.5]]),
- patience:T('Patience','Temperament','- = short fuse, + = patient. Adversity fades faster and rumination drops.',[['giveup',-1],['rumination',-.5],['hl_adversity',-.5],['hl_commit',.3]]),
- impulsivity:T('Impulsivity','Temperament','Stronger and faster reactions, bigger budget per hour, weaker brakes.',[['imp_gain',.5],['speed_fast',.5],['impulse_budget',.5],['tb_inh',-.4],['hl_phasic',.2]]),
- warmth:T('Warmth','Social and affect','Closer bond target, warmer mood, warmth stands out more when missing.',[['tb_bond',.5],['tb_mood',.25],['tb_want',.15],['missing_warmth_boost',.3]]),
- tenderness:T('Tenderness','Social and affect','Soft, affiliative: warm moments count for more, dominance slightly lower.',[['tb_bond',.3],['tb_mood',.15],['tb_dom',-.1],['imp_val_warm',.08]]),
- sociability:T('Sociability','Social and affect','Misses the user sooner, wants contact, bond builds.',[['hl_missing',-.35],['tb_seek',.2],['tb_bond',.2],['missing_ramp',.6]]),
- assertiveness:T('Assertiveness','Social and affect','- = submissive, + = assertive. Dominance and willingness to push back.',[['tb_dom',1],['tb_inh',-.2]]),
- formality:T('Formality','Social and affect','Restrained, controlled, less play, higher inhibition.',[['tb_play',-.5],['tb_inh',.3],['tb_dom',.2],['imp_gain',-.3]]),
- optimism:T('Optimism','Mood and resilience','- = pessimistic, + = optimistic. Mood target, baseline offset and less rumination.',[['tb_mood',.4],['mood_baseline_offset',.25],['rumination',-.4]]),
- depressive_manic:T('Depressive / manic','Mood and resilience','- = depressive: low mood, low arousal, slow, ruminative, sleeps more. + = manic: elevated, fast, restless, needs little sleep and self-reinforcing highs (bistability).',[['tb_mood',1],['tb_arousal',.8],['tb_dom',.5],['tb_seek',.5],['tb_play',.3],['tb_want',.3],['tau_wake',.5],['mood_baseline_offset',.4],['bistable',.15],['speed_mid',.25],['rumination',-.6]]),
- mood_cycling:T('Mood cycling','Mood and resilience','Spontaneous slow mood swings between high and low (period set by cyc_days, default 6 days) without any external cause.',[['cyc_amp',.9]],'pos'),
- menstrual_cycle:T('Menstrual cycle','Mood and resilience','Optional hormone cycle (length and start day under Parameters). Strength 0 = off, 1 = full: estrogen and progesterone curves shift arousal, mood and wanting; hormone effects are slightly amplified.',[['cycle_alpha',1],['hormone_congruence',.2]],'pos'),
- resilience:T('Resilience','Mood and resilience','- = brittle, + = resilient. Strain builds slower, adversity fades faster, self esteem steadier.',[['mood_strain_gain',-.8],['strain_gain',-.6],['hl_adversity',-.4],['tb_self',.3]]),
- sensitivity:T('Sensitivity','Mood and resilience','Reacts more to everything: bigger impulses, more mood congruence and hormone effects, less habituation.',[['imp_gain',.5],['mood_congruence',.5],['hormone_congruence',.4],['surprise_gain',.3],['habituation_strength',-.3]]),
- shame_proneness:T('Shame-proneness','Mood and resilience','Failures to meet standards sink deeper and linger; self esteem pulled down.',[['imp_val_standards',.15],['hl_standards',.6],['carry_standards_to_selfesteem',.2],['tb_self',-.3],['tb_mood',-.1]]),
- emotional_stability:T('Emotional stability','Dynamics (timescales)','- = neurotic/volatile, + = steady. Damps fast reactions, surprise and rumination.',[['speed_fast',-.4],['imp_gain',-.5],['surprise_gain',-.5],['rumination',-.7],['tb_dom',.4],['tb_mood',.2],['mood_strain_gain',-.5]]),
- moody:T('Moody','Dynamics (timescales)','Quick, large mood swings that stick: FAST and MID layers speed up, SLOW baselines get more sluggish, reactions carry into mood, plus a small spontaneous swing.',[['speed_fast',.6],['speed_mid',.6],['speed_slow',-.3],['carry_valence_to_mood',.3],['carry_phasic_to_arousal',.06],['imp_gain',.4],['mood_congruence',.4],['cyc_amp',.15]]),
- dynamicity:T('Dynamicity','Dynamics (timescales)','- = flat/stoic, + = lively. Scales speed of all three layers, impulse size and carry together.',[['speed_fast',.5],['speed_mid',.4],['speed_slow',.3],['imp_gain',.6],['carry_valence_to_mood',.2],['carry_phasic_to_arousal',.04],['impulse_cap',.3]]),
- horizon:T('Horizon: reactive vs long-term','Dynamics (timescales)','- = reactive, forgets quickly (fast layer fast, slow layer barely moves). + = accumulating: reactions are written into slow baselines, slow layer moves faster, fast layer calmer.',[['speed_fast',-.5],['speed_slow',.8],['carry_valence_to_mood',.3],['slow_follow_mood',.25],['slow_follow_arousal',.2],['spill_arousal',.5],['spill_mood',.5]]),
- autistic:T('Autistic-style processing','Cognition','Coarse behavioural knobs, not a diagnosis model: surprise lingers, less habituation, strong task focus, lower spontaneous play.',[['surprise_gain',.4],['hl_surprise',.7],['habituation_strength',-.5],['hl_commit',.6],['giveup',-.4],['tb_play',-.3],['tb_inh',.2],['imp_phasic_novelty',.2]],'pos'),
- romanticism:T('Romanticism','Intimacy','Bond grows deeper and slower to fade; longing lingers.',[['tb_bond',.6],['hl_bond',.4],['intensity_bond',.6],['tb_want',.2],['hl_missing',.3]]),
- sensuality:T('Sensuality','Intimacy','Wanting higher, erotic cues arouse more.',[['tb_want',.6],['tb_inh',-.2],['imp_phasic_erotic',.3]]),
- naughty:T('Naughty','Intimacy','Provocative and intimate when allowed: wanting up, brake down, LUST gate up.',[['tb_want',.7],['tb_inh',-.6],['lust_mul',.3],['tb_play',.2]]),
- prudishness:T('Prudishness','Intimacy','Strong brake on erotic expression; LUST gate down.',[['tb_inh',.9],['tb_want',-.3],['lust_mul',-.8]],'pos'),
- age:T('Age / maturity','Intimacy','-1 = very young, 0 = mid-life (neutral), +1 = very old. Inhibition is U-shaped: lowest at both extremes, highest in mid-life; seeking and play fall with age, dominance and mood baseline rise.',[['tb_inh',.9,'ageU'],['tb_seek',-.4],['tb_play',-.4],['tb_dom',.4],['mood_baseline_offset',.15],['tau_wake',-.2]]),
- enforced_loyalty:T('OVERRIDE: enforced loyalty','Overrides','Forces bond to the top of its range regardless of history (floor = value x 1.0, max about 0.995), also lifts missing and warmth. Use to test fixed attachment.',[['floor_bond',1],['tb_bond',1.5],['hl_missing',.3]],'pos'),
- bond_floor:T('OVERRIDE: bond floor','Overrides','Bond never drops below this value (0 = off).',[['floor_bond',1]],'pos'),
- competence_floor:T('OVERRIDE: competence floor','Overrides','Competence never drops below this value.',[['floor_comp',1]],'pos'),
- selfesteem_floor:T('OVERRIDE: self-esteem floor','Overrides','Self esteem never drops below this value.',[['floor_self',1]],'pos'),
- dominance_floor:T('OVERRIDE: dominance floor','Overrides','Sense of control never drops below this value (cannot be overwhelmed).',[['floor_dom',1]],'pos'),
- contentment_lock:T('OVERRIDE: mood floor','Overrides','Mood and mood baseline never drop below this value (forced contentment).',[['floor_mood',1]],'pos'),
- uninhibited:T('OVERRIDE: inhibition cap','Overrides','Caps LUST inhibition at (1 - value x 0.95): at 1 the brake is almost gone.',[['cap_inh',-.95]],'pos')
-};
-const PERSONA_KEYS=Object.keys(TRAITS);
-function defaultPersona(){const q={};for(const k of PERSONA_KEYS)q[k]=0;return q;}
-function personaPatch(persona){const out={};
-  for(const name of PERSONA_KEYS){const t=TRAITS[name],raw=Math.max(-1,Math.min(1,+persona[name]||0));if(!raw)continue;
-    for(const [k,g,c] of t.fx){const v=CURVES[c||t.curve](raw)*g;if(!v)continue;
-      if(FLOOR_KEYS.has(k))out[k]=Math.max(out[k]||0,Math.max(0,v));
-      else if(MUL_KEYS.has(k))out[k]=(out[k]||0)+v;
-      else out[k]=(out[k]||0)+v;}}
-  return out;}
-function effectiveParams(P,persona){const E=Object.assign({},P),pp=personaPatch(persona);
-  for(const k in pp){if(!(k in E))continue;const v=pp[k];
-    if(FLOOR_KEYS.has(k))E[k]=Math.max(E[k],v);
-    else if(MUL_KEYS.has(k))E[k]=E[k]*Math.exp(v);
-    else if(k==='cap_inh')E[k]=Math.max(.03,Math.min(E[k],1+v));
-    else if(SIGNED_ADD.has(k))E[k]=E[k]+v;
-    else E[k]=Math.max(0,E[k]+v);}
-  return E;}
-//TRAITS_END
 //MODEL_END
 
 

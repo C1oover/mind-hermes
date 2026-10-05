@@ -1,13 +1,12 @@
 # Parameters: `param name = value | label=... step=... min=... max=... visible=false`.
 # `group "Name"` sets the UI group for the params below it. min/max clamp the effective value after traits ran.
 
-
 group "Cross-timescale coupling"
 param speed_fast = 1 | label="FAST layer speed x" step=0.1
 param speed_mid = 1 | label="MID layer speed x" step=0.1
 param speed_slow = 1 | label="SLOW layer speed x" step=0.1
 param carry_valence_to_mood = 0.4 | label="fast valence -> mood carry" step=0.05 min=0
-param carry_phasic_to_arousal = 0.08 | label="fast arousal burst -> arousal carry" step=0.01 min=0
+param carry_phasic_to_arousal = 0.08 | label="fast arousal burst -> arousal carry" min=0
 param carry_standards_to_selfesteem = 0.15 | label="standards impulse -> self esteem carry" step=0.05 min=0
 param slow_follow_mood = 0.35 | label="mood baseline follows 24h mood" step=0.05 min=0
 param slow_follow_arousal = 0.25 | label="arousal baseline follows 24h arousal" step=0.05 min=0
@@ -76,6 +75,46 @@ group "Controller master"
 param ctl_on = 1 | label="controller on (1/0)" step=1
 param demand_gain = 1.6 | label="task demand -> arousal" step=0.1
 
+group "Controller: arousal"
+param ctl_arousal_comfort = 0.6 | label="comfort level"
+param ctl_arousal_drain = 0.4 | label="reserve drain / h"
+param ctl_arousal_rec = 300 | label="recovery half-life (min)" step=10
+param ctl_arousal_rebound = 2.5 | label="rebound depth" step=0.1
+param ctl_arousal_shield = 0.8 | label="task shield" step=0.05
+param ctl_arousal_deriv = 6 | label="derivative damping" step=0.5
+
+group "Controller: seeking"
+param ctl_seeking_comfort = 0.4 | label="comfort level"
+param ctl_seeking_drain = 0.5 | label="reserve drain / h"
+param ctl_seeking_rec = 240 | label="recovery half-life (min)" step=10
+param ctl_seeking_rebound = 1.2 | label="rebound depth" step=0.1
+param ctl_seeking_shield = 0.4 | label="task shield" step=0.05
+param ctl_seeking_deriv = 3 | label="derivative damping" step=0.5
+
+group "Controller: play"
+param ctl_play_comfort = 0.3 | label="comfort level"
+param ctl_play_drain = 0.5 | label="reserve drain / h"
+param ctl_play_rec = 240 | label="recovery half-life (min)" step=10
+param ctl_play_rebound = 1 | label="rebound depth" step=0.1
+param ctl_play_shield = 0 | label="task shield" step=0.05
+param ctl_play_deriv = 2 | label="derivative damping" step=0.5
+
+group "Controller: lust_wanting"
+param ctl_lust_wanting_comfort = 0.3 | label="comfort level"
+param ctl_lust_wanting_drain = 0.8 | label="reserve drain / h"
+param ctl_lust_wanting_rec = 180 | label="recovery half-life (min)" step=10
+param ctl_lust_wanting_rebound = 1.2 | label="rebound depth" step=0.1
+param ctl_lust_wanting_shield = 0 | label="task shield" step=0.05
+param ctl_lust_wanting_deriv = 2 | label="derivative damping" step=0.5
+
+group "Controller: dominance"
+param ctl_dominance_comfort = 0.55 | label="comfort level"
+param ctl_dominance_drain = 0.3 | label="reserve drain / h"
+param ctl_dominance_rec = 360 | label="recovery half-life (min)" step=10
+param ctl_dominance_rebound = 1 | label="rebound depth" step=0.1
+param ctl_dominance_shield = 0.6 | label="task shield" step=0.05
+param ctl_dominance_deriv = 2 | label="derivative damping" step=0.5
+
 group "Strain and spillover"
 param strain_threshold = 0.75 | label="arousal strain threshold"
 param strain_gain = 1.5 | label="arousal strain gain" step=0.1
@@ -98,10 +137,10 @@ param detach_tau = 2880 | label="detachment time constant" step=60
 param bond_baseline = 0.45 | label="bond baseline"
 param circ_arousal = 0.7 | label="circadian -> arousal" step=0.05
 param sleep_pressure_arousal = 1.4 | label="sleep pressure -> arousal" step=0.05
-param ultradian_amp = 0.08 | label="ultradian amplitude" step=0.01
+param ultradian_amp = 0.08 | label="ultradian amplitude"
 param weather_mood = 0.15 | label="weather -> mood"
 param mood_baseline_offset = 0.25 | label="mood baseline offset"
-param bistable = 0 | label="mood bistability" step=0.01 min=0
+param bistable = 0 | label="mood bistability" min=0
 param wanting_deprivation = 0.3 | label="wanting <- time since warmth" step=0.05
 param deprivation_scale = 2880 | label="deprivation time scale (min)" step=60
 
@@ -157,35 +196,3 @@ param cap_inh = 1 | label="CAP lust inhibition (1 = off)" step=0.05 min=0.03
 
 group "Top-level"
 param lust_gate = 1 | label="LUST impulse gate (0-1)" step=0.1
-
-group "Controller"
-param ctl_arousal_comfort = 0.6 | label="ctl arousal comfort"
-param ctl_arousal_drain = 0.4 | label="ctl arousal drain"
-param ctl_arousal_rec = 300 | label="ctl arousal rec"
-param ctl_arousal_rebound = 2.5 | label="ctl arousal rebound"
-param ctl_arousal_shield = 0.8 | label="ctl arousal shield"
-param ctl_arousal_deriv = 6 | label="ctl arousal deriv"
-param ctl_seeking_comfort = 0.4 | label="ctl seeking comfort"
-param ctl_seeking_drain = 0.5 | label="ctl seeking drain"
-param ctl_seeking_rec = 240 | label="ctl seeking rec"
-param ctl_seeking_rebound = 1.2 | label="ctl seeking rebound"
-param ctl_seeking_shield = 0.4 | label="ctl seeking shield"
-param ctl_seeking_deriv = 3 | label="ctl seeking deriv"
-param ctl_play_comfort = 0.3 | label="ctl play comfort"
-param ctl_play_drain = 0.5 | label="ctl play drain"
-param ctl_play_rec = 240 | label="ctl play rec"
-param ctl_play_rebound = 1 | label="ctl play rebound"
-param ctl_play_shield = 0 | label="ctl play shield"
-param ctl_play_deriv = 2 | label="ctl play deriv"
-param ctl_lust_wanting_comfort = 0.3 | label="ctl lust wanting comfort"
-param ctl_lust_wanting_drain = 0.8 | label="ctl lust wanting drain"
-param ctl_lust_wanting_rec = 180 | label="ctl lust wanting rec"
-param ctl_lust_wanting_rebound = 1.2 | label="ctl lust wanting rebound"
-param ctl_lust_wanting_shield = 0 | label="ctl lust wanting shield"
-param ctl_lust_wanting_deriv = 2 | label="ctl lust wanting deriv"
-param ctl_dominance_comfort = 0.55 | label="ctl dominance comfort"
-param ctl_dominance_drain = 0.3 | label="ctl dominance drain"
-param ctl_dominance_rec = 360 | label="ctl dominance rec"
-param ctl_dominance_rebound = 1 | label="ctl dominance rebound"
-param ctl_dominance_shield = 0.6 | label="ctl dominance shield"
-param ctl_dominance_deriv = 2 | label="ctl dominance deriv"

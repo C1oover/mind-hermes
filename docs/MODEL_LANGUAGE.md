@@ -69,4 +69,11 @@ m.evaluateReadout(inputs, params);    // same as Python
 `tests/test_js_parity.py` runs Node and checks that effective parameters (about 100 personas), readouts from a simulated run, UI metadata and
 error messages are identical to the Python model. The test is skipped when Node is not installed. The HTML does not use the module yet.
 
-Not yet implemented: switching `mind_sandbox.html` to the module, user-defined state variables and dynamics (the ODE step is still Python).
+## Web UI uses the model
+
+`mind_sandbox.html` no longer has its own parameter list or trait table. `python tools/build_html.py` embeds `web/mindmodel.js` and the `.mind` files
+between `//MINDMODEL_START` and `//MINDMODEL_END`, so the page works from a file or a server with no extra requests. Edit the `.mind` files, then run the
+script; `tests/test_html_build.py` fails if the embedded copy is stale. The page's parameter panel, trait list and effective parameters now come from the model.
+Before the switch the old and new page logic were run side by side in Node: effective parameters for 100 personas and 12 full simulations were identical.
+
+Not yet implemented: user-defined state variables and dynamics (the ODE step is still Python).
