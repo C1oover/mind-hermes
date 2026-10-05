@@ -1,0 +1,1108 @@
+[
+[
+"speed_fast",
+"FAST layer speed x",
+1,
+0.1,
+"Cross-timescale coupling"
+],
+[
+"speed_mid",
+"MID layer speed x",
+1,
+0.1,
+"Cross-timescale coupling"
+],
+[
+"speed_slow",
+"SLOW layer speed x",
+1,
+0.1,
+"Cross-timescale coupling"
+],
+[
+"carry_valence_to_mood",
+"fast valence -> mood carry",
+0.4,
+0.05,
+"Cross-timescale coupling"
+],
+[
+"carry_phasic_to_arousal",
+"fast arousal burst -> arousal carry",
+0.08,
+0.01,
+"Cross-timescale coupling"
+],
+[
+"carry_standards_to_selfesteem",
+"standards impulse -> self esteem carry",
+0.15,
+0.05,
+"Cross-timescale coupling"
+],
+[
+"slow_follow_mood",
+"mood baseline follows 24h mood",
+0.35,
+0.05,
+"Cross-timescale coupling"
+],
+[
+"slow_follow_arousal",
+"arousal baseline follows 24h arousal",
+0.25,
+0.05,
+"Cross-timescale coupling"
+],
+[
+"mood_avg_hl",
+"24h average half-life (min)",
+1440,
+60,
+"Cross-timescale coupling"
+],
+[
+"hl_phasic",
+"phasic arousal",
+4,
+0.5,
+"Half-lives (min)"
+],
+[
+"hl_valence_reaction",
+"valence reaction",
+8,
+0.5,
+"Half-lives (min)"
+],
+[
+"hl_threat",
+"threat trace",
+10,
+0.5,
+"Half-lives (min)"
+],
+[
+"hl_surprise",
+"surprise trace",
+20,
+1,
+"Half-lives (min)"
+],
+[
+"hl_adversity",
+"adversity trace",
+20,
+1,
+"Half-lives (min)"
+],
+[
+"hl_recent_success",
+"recent success",
+30,
+1,
+"Half-lives (min)"
+],
+[
+"hl_arousal_tonic",
+"arousal (tonic)",
+60,
+5,
+"Half-lives (min)"
+],
+[
+"hl_mood",
+"mood",
+360,
+10,
+"Half-lives (min)"
+],
+[
+"hl_dominance",
+"dominance",
+180,
+10,
+"Half-lives (min)"
+],
+[
+"hl_standards",
+"standards met",
+720,
+30,
+"Half-lives (min)"
+],
+[
+"hl_seeking",
+"seeking",
+90,
+5,
+"Half-lives (min)"
+],
+[
+"hl_play",
+"play",
+120,
+5,
+"Half-lives (min)"
+],
+[
+"hl_wanting",
+"lust wanting",
+45,
+5,
+"Half-lives (min)"
+],
+[
+"hl_inhibition",
+"lust inhibition",
+120,
+5,
+"Half-lives (min)"
+],
+[
+"hl_missing",
+"missing user",
+180,
+10,
+"Half-lives (min)"
+],
+[
+"hl_commit",
+"task commitment",
+15,
+1,
+"Half-lives (min)"
+],
+[
+"tau_boredom",
+"boredom time constant",
+130,
+5,
+"Half-lives (min)"
+],
+[
+"hl_bond",
+"bond",
+14400,
+500,
+"Half-lives (min)"
+],
+[
+"hl_competence",
+"competence",
+2880,
+100,
+"Half-lives (min)"
+],
+[
+"hl_self_esteem",
+"self esteem",
+20160,
+500,
+"Half-lives (min)"
+],
+[
+"hl_arousal_baseline",
+"arousal baseline",
+2160,
+100,
+"Half-lives (min)"
+],
+[
+"hl_mood_baseline",
+"mood baseline",
+4320,
+100,
+"Half-lives (min)"
+],
+[
+"imp_phasic_novelty",
+"arousal <- novelty",
+0.5,
+0.01,
+"Impulse sizes"
+],
+[
+"imp_phasic_threat",
+"arousal <- threat",
+0.9,
+0.01,
+"Impulse sizes"
+],
+[
+"imp_phasic_erotic",
+"arousal <- erotic cue",
+0.4,
+0.01,
+"Impulse sizes"
+],
+[
+"imp_phasic_goal",
+"arousal <- |goal|",
+0.2,
+0.01,
+"Impulse sizes"
+],
+[
+"imp_phasic_anticipation",
+"arousal <- anticipation",
+0.3,
+0.01,
+"Impulse sizes"
+],
+[
+"imp_val_goal",
+"valence <- goal",
+0.15,
+0.01,
+"Impulse sizes"
+],
+[
+"imp_val_warm",
+"valence <- warmth",
+0.1,
+0.01,
+"Impulse sizes"
+],
+[
+"imp_val_standards",
+"valence <- standards",
+0.1,
+0.01,
+"Impulse sizes"
+],
+[
+"reunion_relief",
+"valence <- reunion",
+0.6,
+0.01,
+"Impulse sizes"
+],
+[
+"impulse_cap",
+"cap per step (latent)",
+0.8,
+0.01,
+"Impulse sizes"
+],
+[
+"impulse_budget",
+"budget per hour (latent)",
+1.5,
+0.1,
+"Impulse sizes"
+],
+[
+"appraisal_saturation",
+"per-step saturation",
+3,
+0.1,
+"Impulse sizes"
+],
+[
+"surprise_gain",
+"surprise per novelty/failure",
+0.3,
+0.05,
+"Impulse sizes"
+],
+[
+"habituation_strength",
+"habituation strength",
+0.15,
+0.01,
+"Conditioning"
+],
+[
+"habituation_half_life",
+"habituation half-life",
+30,
+1,
+"Conditioning"
+],
+[
+"mood_congruence",
+"mood congruence",
+0.3,
+0.01,
+"Conditioning"
+],
+[
+"hormone_congruence",
+"hormone congruence",
+0.2,
+0.01,
+"Conditioning"
+],
+[
+"missing_warmth_boost",
+"warmth boost when missing",
+0.5,
+0.01,
+"Conditioning"
+],
+[
+"intensity_bond",
+"intense warmth bonds more",
+1,
+0.01,
+"Conditioning"
+],
+[
+"freeform_reference",
+"reference (delta covering 76%)",
+5,
+0.5,
+"Freeform impulses"
+],
+[
+"hammer_scale",
+"hammer scale",
+1,
+0.1,
+"Freeform impulses"
+],
+[
+"hammer_half_life",
+"hammer recovery (min)",
+30,
+1,
+"Freeform impulses"
+],
+[
+"gate_floor_phasic",
+"phasic gate floor",
+0.1,
+0.01,
+"Gates and blunting"
+],
+[
+"phasic_scale",
+"phasic scale",
+3,
+0.1,
+"Gates and blunting"
+],
+[
+"blunting",
+"sleep-debt blunting",
+1.2,
+0.1,
+"Gates and blunting"
+],
+[
+"rumination",
+"rumination",
+0.5,
+0.01,
+"Gates and blunting"
+],
+[
+"giveup",
+"give-up rate",
+0.5,
+0.01,
+"Gates and blunting"
+],
+[
+"ctl_on",
+"controller on (1/0)",
+1,
+1,
+"Controller master"
+],
+[
+"demand_gain",
+"task demand -> arousal",
+1.6,
+0.1,
+"Controller master"
+],
+[
+"ctl_arousal_comfort",
+"comfort level",
+0.6,
+0.01,
+"Controller: arousal"
+],
+[
+"ctl_arousal_drain",
+"reserve drain / h",
+0.4,
+0.01,
+"Controller: arousal"
+],
+[
+"ctl_arousal_rec",
+"recovery half-life (min)",
+300,
+10,
+"Controller: arousal"
+],
+[
+"ctl_arousal_rebound",
+"rebound depth",
+2.5,
+0.1,
+"Controller: arousal"
+],
+[
+"ctl_arousal_shield",
+"task shield",
+0.8,
+0.05,
+"Controller: arousal"
+],
+[
+"ctl_arousal_deriv",
+"derivative damping",
+6,
+0.5,
+"Controller: arousal"
+],
+[
+"ctl_seeking_comfort",
+"comfort level",
+0.4,
+0.01,
+"Controller: seeking"
+],
+[
+"ctl_seeking_drain",
+"reserve drain / h",
+0.5,
+0.01,
+"Controller: seeking"
+],
+[
+"ctl_seeking_rec",
+"recovery half-life (min)",
+240,
+10,
+"Controller: seeking"
+],
+[
+"ctl_seeking_rebound",
+"rebound depth",
+1.2,
+0.1,
+"Controller: seeking"
+],
+[
+"ctl_seeking_shield",
+"task shield",
+0.4,
+0.05,
+"Controller: seeking"
+],
+[
+"ctl_seeking_deriv",
+"derivative damping",
+3,
+0.5,
+"Controller: seeking"
+],
+[
+"ctl_play_comfort",
+"comfort level",
+0.3,
+0.01,
+"Controller: play"
+],
+[
+"ctl_play_drain",
+"reserve drain / h",
+0.5,
+0.01,
+"Controller: play"
+],
+[
+"ctl_play_rec",
+"recovery half-life (min)",
+240,
+10,
+"Controller: play"
+],
+[
+"ctl_play_rebound",
+"rebound depth",
+1,
+0.1,
+"Controller: play"
+],
+[
+"ctl_play_shield",
+"task shield",
+0,
+0.05,
+"Controller: play"
+],
+[
+"ctl_play_deriv",
+"derivative damping",
+2,
+0.5,
+"Controller: play"
+],
+[
+"ctl_lust_wanting_comfort",
+"comfort level",
+0.3,
+0.01,
+"Controller: lust_wanting"
+],
+[
+"ctl_lust_wanting_drain",
+"reserve drain / h",
+0.8,
+0.01,
+"Controller: lust_wanting"
+],
+[
+"ctl_lust_wanting_rec",
+"recovery half-life (min)",
+180,
+10,
+"Controller: lust_wanting"
+],
+[
+"ctl_lust_wanting_rebound",
+"rebound depth",
+1.2,
+0.1,
+"Controller: lust_wanting"
+],
+[
+"ctl_lust_wanting_shield",
+"task shield",
+0,
+0.05,
+"Controller: lust_wanting"
+],
+[
+"ctl_lust_wanting_deriv",
+"derivative damping",
+2,
+0.5,
+"Controller: lust_wanting"
+],
+[
+"ctl_dominance_comfort",
+"comfort level",
+0.55,
+0.01,
+"Controller: dominance"
+],
+[
+"ctl_dominance_drain",
+"reserve drain / h",
+0.3,
+0.01,
+"Controller: dominance"
+],
+[
+"ctl_dominance_rec",
+"recovery half-life (min)",
+360,
+10,
+"Controller: dominance"
+],
+[
+"ctl_dominance_rebound",
+"rebound depth",
+1,
+0.1,
+"Controller: dominance"
+],
+[
+"ctl_dominance_shield",
+"task shield",
+0.6,
+0.05,
+"Controller: dominance"
+],
+[
+"ctl_dominance_deriv",
+"derivative damping",
+2,
+0.5,
+"Controller: dominance"
+],
+[
+"strain_threshold",
+"arousal strain threshold",
+0.75,
+0.01,
+"Strain and spillover"
+],
+[
+"strain_gain",
+"arousal strain gain",
+1.5,
+0.1,
+"Strain and spillover"
+],
+[
+"strain_hl",
+"arousal strain half-life",
+720,
+30,
+"Strain and spillover"
+],
+[
+"strain_to_baseline",
+"strain -> arousal baseline",
+0.35,
+0.01,
+"Strain and spillover"
+],
+[
+"mood_strain_threshold",
+"low-mood strain threshold",
+0.4,
+0.01,
+"Strain and spillover"
+],
+[
+"mood_strain_gain",
+"low-mood strain gain",
+1,
+0.1,
+"Strain and spillover"
+],
+[
+"mood_strain_to_baseline",
+"strain -> mood baseline",
+0.6,
+0.01,
+"Strain and spillover"
+],
+[
+"spill_arousal",
+"spill phasic -> arousal baseline",
+0.15,
+0.01,
+"Strain and spillover"
+],
+[
+"spill_mood",
+"spill reaction -> mood baseline",
+0.1,
+0.01,
+"Strain and spillover"
+],
+[
+"spill_debt",
+"spill wake -> sleep debt",
+0.002,
+0.001,
+"Strain and spillover"
+],
+[
+"spill_daily_cap",
+"spill daily cap (latent)",
+0.6,
+0.05,
+"Strain and spillover"
+],
+[
+"boredom_rate",
+"boredom build rate",
+0.8,
+0.01,
+"Drives and targets"
+],
+[
+"reunion_keep",
+"missing kept after reunion",
+0.4,
+0.01,
+"Drives and targets"
+],
+[
+"missing_ramp",
+"missing ramp",
+2,
+0.1,
+"Drives and targets"
+],
+[
+"detach_start",
+"detachment starts (min)",
+4320,
+60,
+"Drives and targets"
+],
+[
+"detach_tau",
+"detachment time constant",
+2880,
+60,
+"Drives and targets"
+],
+[
+"bond_baseline",
+"bond baseline",
+0.45,
+0.01,
+"Drives and targets"
+],
+[
+"circ_arousal",
+"circadian -> arousal",
+0.7,
+0.05,
+"Drives and targets"
+],
+[
+"sleep_pressure_arousal",
+"sleep pressure -> arousal",
+1.4,
+0.05,
+"Drives and targets"
+],
+[
+"ultradian_amp",
+"ultradian amplitude",
+0.08,
+0.01,
+"Drives and targets"
+],
+[
+"weather_mood",
+"weather -> mood",
+0.15,
+0.01,
+"Drives and targets"
+],
+[
+"mood_baseline_offset",
+"mood baseline offset",
+0.25,
+0.01,
+"Drives and targets"
+],
+[
+"bistable",
+"mood bistability",
+0,
+0.01,
+"Drives and targets"
+],
+[
+"wanting_deprivation",
+"wanting <- time since warmth",
+0.3,
+0.05,
+"Drives and targets"
+],
+[
+"deprivation_scale",
+"deprivation time scale (min)",
+2880,
+60,
+"Drives and targets"
+],
+[
+"tau_wake",
+"wake time constant (min)",
+1092,
+30,
+"Body and clock"
+],
+[
+"tau_sleep",
+"sleep time constant (min)",
+252,
+10,
+"Body and clock"
+],
+[
+"load_fatigue",
+"load -> fatigue",
+0.0015,
+0.0005,
+"Body and clock"
+],
+[
+"stress_fatigue",
+"stress -> fatigue",
+0.0008,
+0.0005,
+"Body and clock"
+],
+[
+"light_fatigue",
+"dark -> fatigue",
+0.3,
+0.01,
+"Body and clock"
+],
+[
+"moon_sleep",
+"moon -> sleep",
+0.3,
+0.01,
+"Body and clock"
+],
+[
+"clock_anchor",
+"clock anchor (h)",
+15,
+0.5,
+"Body and clock"
+],
+[
+"clock_period",
+"clock period (h)",
+24,
+0.1,
+"Body and clock"
+],
+[
+"phase_gain",
+"phase shift gain",
+0.0015,
+0.0005,
+"Body and clock"
+],
+[
+"anchor_pull",
+"anchor pull",
+0.01,
+0.005,
+"Body and clock"
+],
+[
+"sleep_threshold",
+"sleep threshold",
+-0.3,
+0.05,
+"Body and clock"
+],
+[
+"sleep_standards_boost",
+"sleep heals standards",
+1,
+1,
+"Body and clock"
+],
+[
+"lat",
+"latitude",
+48.2,
+0.5,
+"Environment"
+],
+[
+"start_doy",
+"start day of year",
+278,
+1,
+"Environment"
+],
+[
+"cloud",
+"cloud cover",
+0.4,
+0.05,
+"Environment"
+],
+[
+"pressure",
+"pressure (hPa)",
+1013,
+1,
+"Environment"
+],
+[
+"weather_swing",
+"pressure swing (hPa)",
+0,
+1,
+"Environment"
+],
+[
+"moon_on",
+"moon effect",
+1,
+0.1,
+"Environment"
+],
+[
+"moon_phase0",
+"lunar age at start (d)",
+5,
+0.5,
+"Environment"
+],
+[
+"cycle_alpha",
+"cycle strength (0 = off; set by trait Menstrual cycle)",
+0,
+0.1,
+"Persona (cycle timing)"
+],
+[
+"cycle_length",
+"cycle length (days)",
+28,
+1,
+"Persona (cycle timing)"
+],
+[
+"cycle_start_day",
+"cycle day at start",
+3,
+1,
+"Persona (cycle timing)"
+],
+[
+"tb_arousal",
+"arousal target bias (logit)",
+0,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"tb_mood",
+"mood target bias",
+0,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"tb_dom",
+"dominance target bias (logit)",
+0,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"tb_seek",
+"seeking target bias (logit)",
+0,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"tb_play",
+"play target bias (logit)",
+0,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"tb_want",
+"wanting target bias (logit)",
+0,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"tb_inh",
+"inhibition target bias (logit)",
+0,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"tb_bond",
+"bond target bias (logit)",
+0,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"tb_comp",
+"competence target bias (logit)",
+0,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"tb_self",
+"self esteem target bias (logit)",
+0,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"imp_gain",
+"all appraisal impulses x",
+1,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"lust_mul",
+"LUST gate x",
+1,
+0.1,
+"Trait hooks (advanced)"
+],
+[
+"cyc_amp",
+"spontaneous mood cycle amplitude",
+0,
+0.05,
+"Trait hooks (advanced)"
+],
+[
+"cyc_days",
+"spontaneous cycle period (days)",
+6,
+0.5,
+"Trait hooks (advanced)"
+],
+[
+"floor_bond",
+"FLOOR bond (0 = off)",
+0,
+0.05,
+"Trait hooks (advanced)"
+],
+[
+"floor_comp",
+"FLOOR competence (0 = off)",
+0,
+0.05,
+"Trait hooks (advanced)"
+],
+[
+"floor_self",
+"FLOOR self esteem (0 = off)",
+0,
+0.05,
+"Trait hooks (advanced)"
+],
+[
+"floor_dom",
+"FLOOR dominance (0 = off)",
+0,
+0.05,
+"Trait hooks (advanced)"
+],
+[
+"floor_mood",
+"FLOOR mood and baseline (0 = off)",
+0,
+0.05,
+"Trait hooks (advanced)"
+],
+[
+"cap_inh",
+"CAP lust inhibition (1 = off)",
+1,
+0.05,
+"Trait hooks (advanced)"
+],
+[
+"lust_gate",
+"LUST impulse gate (0-1)",
+1,
+0.1,
+"Top-level"
+]
+]

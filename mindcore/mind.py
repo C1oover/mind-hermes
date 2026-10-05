@@ -281,7 +281,7 @@ class Mind:
             z["lust_inhibition"] = min(z["lust_inhibition"], lu2(max(.01, P["cap_inh"])))
         self.readout(present, env, C)
 
-    def readout(self, present, env, C):
+    def readout_legacy(self, present, env, C):
         x = {k: self.value(k) for k in LATENT}
         for k in VALUE:
             x[k] = getattr(self, k)
@@ -309,3 +309,20 @@ class Mind:
             "circadian": (C + 1) / 2, "light": env["light"], "cycle_estrogen": env["H_E"], "cycle_progesterone": env["H_P"],
             "moon": env["moon"], "present": present, "clock_phase": self.clock_phase,
         }
+
+    def readout_inputs(self, present, env, C):
+        x = {k: self.value(k) for k in LATENT}
+        for k in VALUE:
+            x[k] = getattr(self, k)
+        arousal, mood = self.effective()
+        x.update(arousal=arousal, mood=mood, stress=self.stress(), cert=self.certainty(), threat_trace=self.threat_trace,
+                 adversity_trace=self.adversity_trace, aStrain=self.aStrain, mStrain=self.mStrain, present=present,
+                 clock_phase=self.clock_phase, circ=C, light=env["light"], H_E=env["H_E"], H_P=env["H_P"], moon=env["moon"],
+                 res_arousal=self.res["arousal"], res_seeking=self.res["seeking"], res_play=self.res["play"],
+                 res_wanting=self.res["lust_wanting"], res_dominance=self.res["dominance"])
+        return x
+
+    def readout(self, present, env, C):
+        """Readouts are defined in mindcore/model/readout.mind (see docs/MODEL_LANGUAGE.md)."""
+        from .model import get_model
+        self.out = get_model().evaluate_readout(self.readout_inputs(present, env, C), self.P)

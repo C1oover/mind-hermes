@@ -1,0 +1,4 @@
+# Derived parameters, evaluated after traits and clamps.
+resolve {
+  lust_gate *= lust_mul
+}
