@@ -69,4 +69,4 @@ m.evaluateReadout(inputs, params);    // same as Python
 `tests/test_js_parity.py` runs Node and checks that effective parameters (about 100 personas), readouts from a simulated run, UI metadata and
 error messages are identical to the Python model. The test is skipped when Node is not installed. The HTML does not use the module yet.
 
-Not yet implemented: switching `mind_sandbox.html` to the module, user-defined state variables and dynamics (the ODE step is still Python), and a JavaScript parser for the web UI.
+Not yet implemented: switching `mind_sandbox.html` to the module, user-defined state variables and dynamics (the ODE step is still Python).
